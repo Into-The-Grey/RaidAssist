@@ -24,7 +24,7 @@ We are committed to fostering a welcoming community. Please read our [Code of Co
 
 ## License
 
-This project is open-source and available under the terms of the [LICENSE](/docs/repo/LICENSE.md).
+This project is open-source and available under the terms of the [LICENSE](/docs/repo/LICENSE).
 
 ## Roadmap
 
