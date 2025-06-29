@@ -1,0 +1,59 @@
+name: Sync GitHub Pages from Markdown
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/repo/ROADMAP.md'
+      - 'docs/repo/CHANGELOG.md'
+      - 'assets/style.css'
+
+permissions:
+  contents: write
+
+jobs:
+  build-pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Prepare output folder and copy style
+        run: |
+          mkdir -p output
+          cp assets/style.css output/style.css
+
+      - name: Convert ROADMAP.md to index.html
+        run: |
+          pandoc docs/repo/ROADMAP.md \
+            -o output/index.html \
+            --standalone \
+            --metadata title="RaidAssist Roadmap" \
+            --css style.css
+        working-directory: output
+
+      - name: Convert CHANGELOG.md to changelog.html
+        run: |
+          pandoc docs/repo/CHANGELOG.md \
+            -o output/changelog.html \
+            --standalone \
+            --metadata title="RaidAssist Changelog" \
+            --css style.css
+        working-directory: output
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Copy HTML files to gh-pages and push
+        run: |
+          cp output/*.html gh-pages/
+          cd gh-pages
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add index.html changelog.html
+          git diff --cached --quiet || git commit -m "Auto-update GitHub Pages from markdown"
+          git push
