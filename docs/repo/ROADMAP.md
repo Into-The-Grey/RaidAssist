@@ -58,7 +58,3 @@ Welcome to the development roadmap for **RaidAssist**. This document outlines th
 
 ---
 
-Got a feature idea or want to vote on priorities?  
-Open an issue or leave feedback in the official Discord!
-
----
