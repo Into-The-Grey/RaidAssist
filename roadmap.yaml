@@ -1,0 +1,109 @@
+- id: loadout-manager
+  title: Loadout Manager
+  phase: Phase 1
+  status: Complete
+  date_added: 2025-06-29
+  author: Cain
+  description: Save/load subclass, armor, mods, and weapons for instant swapping.
+  idea: Reduce time spent swapping builds before raids or GMs.
+  depends_on: []
+
+- id: overlay-ui
+  title: Overlay UI
+  phase: Phase 1
+  status: In Progress
+  date_added: 2025-06-30
+  author: Cain
+  description: In-game overlay showing live fireteam stats, objectives, and info.
+  idea: Provide live at-a-glance information without alt-tabbing.
+  depends_on: [loadout-manager]
+
+- id: red-border-tracker
+  title: Red Border Tracker
+  phase: Phase 2
+  status: Planned
+  date_added: 2025-07-01
+  author: Cain
+  description: Track which red border weapons are unlocked and available for crafting.
+  idea: Prevent missed weapon patterns and help with loot focus.
+  depends_on: [overlay-ui]
+
+- id: catalyst-tracker
+  title: Catalyst Tracker
+  phase: Phase 2
+  status: In Progress
+  date_added: 2025-06-29
+  author: Cain
+  description: Show catalyst status and unlock progress for all tracked exotics.
+  idea: Help players track catalysts they're working on and never forget a grind.
+  depends_on: [overlay-ui]
+
+- id: github-pages-roadmap
+  title: Interactive Roadmap (This Page!)
+  phase: Phase 1
+  status: Complete
+  date_added: 2025-06-29
+  author: Cain
+  description: Auto-updating tech tree roadmap site, generated from a YAML file.
+  idea: Make the vision clear to all contributors and track progress visually.
+  depends_on: []
+
+- id: changelog-autogen
+  title: Auto-generated Changelog Page
+  phase: Phase 1
+  status: Complete
+  date_added: 2025-06-30
+  author: Cain
+  description: Changelog site generated automatically from CHANGELOG.md, styled to match.
+  idea: Keep contributors and users updated on progress without extra work.
+  depends_on: [github-pages-roadmap]
+
+- id: automation-gh-action
+  title: GitHub Actions: Roadmap & Changelog Sync
+  phase: Phase 1
+  status: Complete
+  date_added: 2025-07-01
+  author: Cain
+  description: Workflow auto-syncs the roadmap and changelog to the public Pages site.
+  idea: Remove manual busywork and ensure the public site is always up-to-date.
+  depends_on: [github-pages-roadmap, changelog-autogen]
+
+- id: contributor-onboarding
+  title: Friendly Onboarding Docs & Templates
+  phase: Phase 2
+  status: Planned
+  date_added: 2025-07-01
+  author: Cain
+  description: Clear README, Contribution Guide, Code of Conduct, and issue templates.
+  idea: Make it easy for new contributors to get started and help out.
+  depends_on: [automation-gh-action]
+
+- id: customizable-widgets
+  title: Customizable Overlay Widgets
+  phase: Phase 3
+  status: Planned
+  date_added: 2025-07-02
+  author: Cain
+  description: Overlay UI allows users to toggle on/off widgets like stat trackers, exotic status, and loot objectives.
+  idea: Let every player build their perfect info dashboard.
+  depends_on: [overlay-ui]
+
+- id: theme-support
+  title: Overlay Theme Support
+  phase: Phase 3
+  status: Planned
+  date_added: 2025-07-02
+  author: Cain
+  description: Add visual themes (Destiny-inspired, light/dark modes) to the overlay for style and accessibility.
+  idea: Match the user’s vibe and enhance readability/immersion.
+  depends_on: [customizable-widgets]
+
+- id: analytics-privacy
+  title: (Idea) Private, Optional Analytics
+  phase: Future
+  status: Idea
+  date_added: 2025-07-02
+  author: Cain
+  description: (Maybe) Add opt-in anonymous stats to help improve RaidAssist features and balance.
+  idea: Learn which features are most used, but only if the user allows it—no privacy risks.
+  depends_on: []

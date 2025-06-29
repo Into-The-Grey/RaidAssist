@@ -1,13 +1,14 @@
-name: Sync GitHub Pages from Markdown
+name: Sync GitHub Pages from Markdown and YAML
 
 on:
-  # Trigger when ROADMAP, CHANGELOG, or style is updated
+  # Trigger when ROADMAP, CHANGELOG, roadmap.yaml, or style is updated
   push:
     branches: [main]
     paths:
       - 'docs/repo/ROADMAP.md'
       - 'docs/repo/CHANGELOG.md'
       - 'assets/style.css'
+      - 'roadmap.yaml'
 
   # Allow manual runs from the GitHub UI
   workflow_dispatch:
@@ -32,10 +33,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc
 
-      - name: Prepare output and copy custom CSS
+      - name: Prepare output and copy custom CSS and YAML
         run: |
           mkdir -p output
           cp assets/style.css output/
+          cp roadmap.yaml output/
 
       - name: Convert ROADMAP.md to index.html
         run: |
@@ -61,12 +63,13 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
-      - name: Copy HTML to gh-pages and push
+      - name: Copy output files to gh-pages and push
         run: |
           cp output/*.html gh-pages/
+          cp output/roadmap.yaml gh-pages/
           cd gh-pages
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add index.html changelog.html
-          git diff --cached --quiet || git commit -m "Auto-update GitHub Pages from markdown"
+          git add index.html changelog.html roadmap.yaml
+          git diff --cached --quiet || git commit -m "Auto-update GitHub Pages from markdown and roadmap.yaml"
           git push
