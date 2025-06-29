@@ -19,6 +19,14 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4
 
+      - name: Install pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Prepare output folder and copy style
+        run: |
+          mkdir -p output
+          cp assets/style.css output/style.css
+
       - name: Prepare output folder and copy style
         run: |
           mkdir -p output
