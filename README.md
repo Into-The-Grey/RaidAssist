@@ -29,5 +29,3 @@ This project is open-source and available under the terms of the [LICENSE](/docs
 ## Roadmap
 
 Curious about what’s coming next? Check out our [Roadmap](/docs/repo/ROADMAP.md) to see the upcoming features and plans for future development.
-
----
