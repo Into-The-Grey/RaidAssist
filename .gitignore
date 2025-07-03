@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.cache/
+.cache
+*.log
+session.json
+.vscode
