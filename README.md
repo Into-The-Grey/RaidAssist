@@ -1,31 +1,93 @@
 # RaidAssist
 
-**RaidAssist** is a comprehensive tool designed for Destiny 2 players to enhance their gameplay experience by providing detailed insights and convenient features both in and out of the game.
+**RaidAssist** is a next-generation Destiny 2 desktop companion app and overlay for dedicated players and completionists.
+Built for PC, RaidAssist puts your meta progress, catalysts, exotics, and crafting at your fingertips—**without alt-tabbing**.
 
-## Features
+---
 
-* **Raid and Dungeon Tracking**: Automatically tracks and displays your fireteam's raid and dungeon progress, offering insights on completion rates and attempts.
+## ✨ Features (Alpha)
 
-* **Weekly Activity Highlights**: Keeps you up-to-date with the most relevant activities each week, so you never miss out on important events.
+* **Dashboard Tabs:** Instantly see all your Red Border weapons, Catalyst progress, and Exotic collection in a clean interface.
+* **Search & Filter:** Quickly find any item across your collection.
+* **Overlay Mode:** One-click, always-on-top overlay for live progress tracking while you play. Move and adjust transparency as you like.
+* **Global Hotkey:** Toggle the overlay in and out with Ctrl+Alt+O (configurable in future).
+* **System Tray Integration:** Minimize to tray, with menu and desktop notifications for milestones (pattern/catalyst/exotic completion).
+* **Tooltips:** Hover any item for manifest-backed details—archetype, ammo, description, and more.
+* **API Tester:** Run Bungie API calls right from the app for power users and debugging.
+* **Auto-Refresh & Settings:** Keep data up-to-date automatically, with refresh interval control.
+* **Data Export:** Export your current progress (JSON/CSV) for analysis or sharing.
 
-* **Loadout Snapshots**: Quickly view and manage your current loadout, with future plans to suggest optimized builds based on your playstyle.
+---
 
-* **Notification System**: Receive alerts about important in-game events and personal milestones, with plans to expand into more personalized notifications.
+## 🚧 Status: v0.1.0-alpha
 
-* **Premium Overlay Feature**: A customizable in-game overlay that can be toggled on or off with a hotkey. This overlay will show widgets for tracking progress on red border weapons, exotic ownership, and catalyst completion status.
+This is an **alpha release** for testers, early adopters, and feedback.
+Features are stable, but bugs and quirks may exist.
+Major expansions (see below) are in progress.
 
-## How to Contribute
+---
 
-Check out our [Collaboration Guide](/docs/repo/COLLABORATION.md) for details on how to get involved, our coding standards, and how to submit changes.
+## 🔥 Roadmap / Upcoming Features
 
-## Code of Conduct
+Planned and premium features include:
 
-We are committed to fostering a welcoming community. Please read our [Code of Conduct](/docs/repo/CODE_OF_CONDUCT.md) to understand our expectations for all contributors.
+* **Multi-account support**
+* **Full raid, dungeon, and activity tracking**
+* **Custom overlay widgets & layout**
+* **Weekly milestones and vendor rotation**
+* **Cloud sync & mobile/web dashboard**
+* **Discord/social integration**
+* **Loadout management & recommendations**
+* **More notifications & advanced stats**
 
-## License
+See the [Roadmap](/docs/repo/ROADMAP.md) for details.
 
-This project is open-source and available under the terms of the [LICENSE](/docs/repo/LICENSE).
+---
 
-## Roadmap
+## 🛠️ How to Use / Install
 
-Curious about what’s coming next? Check out our [Roadmap](/docs/repo/ROADMAP.md) to see the upcoming features and plans for future development.
+1. **Requirements:**
+
+   * Python 3.8+
+   * See [requirements.txt](/requirements.txt) for dependencies (`PySide2`, `requests`, `pyqt-hotkey`).
+
+2. **Running the App:**
+
+   ```bash
+   pip install -r requirements.txt
+   python ui/interface.py
+   ```
+
+   *(Installer/exe coming soon)*
+
+---
+
+## 🤝 How to Contribute
+
+Check out our [Collaboration Guide](/docs/repo/CONTRIBUTING.md) for dev setup, code standards, and submitting PRs.
+
+---
+
+## 💬 Code of Conduct
+
+We are committed to a welcoming, inclusive community.
+See our [Code of Conduct](/docs/repo/CODE_OF_CONDUCT.md).
+
+---
+
+## 📝 License
+
+This project is licensed under the Apache License 2.0.
+See [LICENSE](/docs/repo/LICENSE) for details.
+
+---
+
+## Screenshots
+
+![Dashboard Screenshot](docs/images/dashboard.png)
+![Overlay Demo GIF](docs/images/overlay-demo.gif)
+
+---
+
+**Have feedback, bug reports, or feature requests?**
+Open an issue or join our community—every suggestion helps shape RaidAssist!
