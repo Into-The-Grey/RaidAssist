@@ -19,6 +19,22 @@ Built for PC, RaidAssist puts your meta progress, catalysts, exotics, and crafti
 
 ---
 
+## 🛡️ Bungie API Authentication
+
+RaidAssist uses an official, app-owned Bungie API key to connect securely to Bungie.net—just like DIM, Braytech, and other trusted Destiny 2 apps.  
+**You never need to register your own API key or developer account.**
+
+* On first run, RaidAssist will ask you to log in with your Bungie account via OAuth.
+* Your credentials are never stored; only a temporary session token is saved (locally, never uploaded).
+* All communication is handled via the app's API key, so setup is instant and hassle-free.
+
+**FAQ:**  
+
+* "Will this get me banned?" — No. Using the official Bungie API and OAuth is fully supported, just like Destiny Item Manager and Braytech.
+* "Is my data private?" — Yes. Only your own OAuth token is stored locally, and never shared.
+
+---
+
 ## 🚧 Status: v0.1.0-alpha
 
 This is an **alpha release** for testers, early adopters, and feedback.

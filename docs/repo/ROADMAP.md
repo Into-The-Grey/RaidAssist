@@ -18,6 +18,9 @@ This document outlines shipped features, current milestones, premium upgrades, a
 - [x] Auto-refresh with interval settings
 - [x] Data export (JSON/CSV)
 - [x] Basic settings dialog and loading UI
+- [x] Windows EXE/installer build (no Python required)
+- [x] No user API key required — use app-owned Bungie API key for all requests
+- [x] OAuth-based authentication, session tokens handled locally
 
 ---
 
