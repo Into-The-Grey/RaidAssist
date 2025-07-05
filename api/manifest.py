@@ -6,10 +6,19 @@ manifest.py — Download, cache, and load the Destiny 2 manifest for item lookup
 - Provides helpers for display name lookup
 """
 
+
 import os
 import requests
 import json
 import logging
+
+# Load .env variables if present
+try:
+    from dotenv import load_dotenv # type: ignore
+
+    load_dotenv()
+except ImportError:
+    pass  # Continue if dotenv is not available; fall back to OS/env/hardcoded
 
 BASE_URL = "https://www.bungie.net"
 MANIFEST_URL = f"{BASE_URL}/Platform/Destiny2/Manifest/"
@@ -24,7 +33,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-HEADERS = {"X-API-Key": os.environ.get("BUNGIE_API_KEY", "YOUR_BUNGIE_API_KEY")}
+# Fallback order: .env → OS → hardcoded default
+API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
+HEADERS = {"X-API-Key": API_KEY}
 
 
 def fetch_manifest():

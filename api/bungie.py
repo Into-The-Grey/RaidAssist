@@ -3,6 +3,14 @@ import json
 import requests
 import logging
 
+# Load .env variables if present
+try:
+    from dotenv import load_dotenv # type: ignore
+
+    load_dotenv()
+except ImportError:
+    pass  # Continue if dotenv is not available; fall back to OS/env/hardcoded
+
 # Set up basic logging
 LOG_PATH = "RaidAssist/logs/bungie_api.log"
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
@@ -12,8 +20,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-# Load API key from env or fallback (replace with your actual key or .env)
-API_KEY = os.environ.get("BUNGIE_API_KEY", "YOUR_BUNGIE_API_KEY")
+# Fallback order: .env → OS → hardcoded default
+API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
 
 PROFILE_CACHE_PATH = "RaidAssist/cache/profile.json"
 SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
