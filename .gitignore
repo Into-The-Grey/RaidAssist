@@ -1,7 +1,75 @@
+# Python cache and bytecode
 __pycache__/
 *.pyc
-.cache/
-.cache
-*.log
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.pycache
+*.egg-info/
+build/
+dist/
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+pip-wheel-metadata/
+
+# OS/system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+
+# RaidAssist application cache and config
+RaidAssist/cache/
+RaidAssist/logs/
+RaidAssist/config/
+RaidAssist/tmp/
+RaidAssist/test_cache/
+
+# User/session/secret data
+*.env
+.env
+.env.*
 session.json
-.vscode
+*.sqlite3
+*.db
+*.db-journal
+
+# App icons and assets (if you want to keep these local/private)
+assets/*.png
+assets/*.ico
+
+# PyInstaller/cx_Freeze/freeze build outputs
+*.spec
+output/
+*.exe
+*.app
+
+# Test/coverage
+htmlcov/
+.coverage
+.tox/
+.cache/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Misc
+*.bak
+*.tmp
+*.old
