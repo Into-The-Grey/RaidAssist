@@ -6,9 +6,10 @@ Welcome, developer! This guide helps you get your environment ready for RaidAssi
 
 ## 🖥️ 1. System Requirements
 
-* Python 3.8 or higher (recommended: 3.10–3.12)
-* Git (for cloning and version control)
-* OS: Windows, macOS, or Linux
+* **Python** 3.8 or higher (recommended: 3.10–3.12)
+* **Git** (for cloning and version control)
+* **OS:** Windows (required for Destiny 2 compatibility; code is cross-platform but only tested on Windows)
+* \[Optional] **Visual Studio Code** or your favorite code editor
 
 ---
 
@@ -35,9 +36,22 @@ cd raidassist
    pip install -r dev-requirements.txt
    ```
 
+3. **Environment variables / API keys:**
+
+   * Copy `.env.example` to `.env` in the project root:
+
+     ```bash
+     cp .env.example .env
+     ```
+
+   * Fill in your Bungie API key and Client ID in the new `.env` file.
+
+   > **Note:** The app will automatically load variables from `.env` (using `python-dotenv`).
+   > **Never commit your real `.env` to the repo.**
+
 ---
 
-## 🛠️ 4. Running the App
+## 🚀 4. Running the App
 
 ```bash
 python ui/interface.py
@@ -54,7 +68,6 @@ python ui/interface.py
   ```bash
   pytest
   ```
-
 * Place new tests in the `/tests` folder.
 
 ---
@@ -68,12 +81,19 @@ python ui/interface.py
   isort .
   mypy .
   ```
-
 * Fix lint errors before pushing.
 
 ---
 
-## 💡 7. Tips & Troubleshooting
+## 🔑 7. Working with Bungie API Keys
+
+* RaidAssist uses a secure, app-owned Bungie API key and OAuth client ID.
+* **Do not share your real key in code, docs, or screenshots.**
+* The `.env.example` file serves as a template; never commit your filled-out `.env`.
+
+---
+
+## 💡 8. Tips & Troubleshooting
 
 * For manifest or API issues, see `docs/repo/TROUBLESHOOTING.md` (coming soon).
 * Check the [README.md](/README.md) and [ROADMAP.md](./ROADMAP.md) for project context.
@@ -81,7 +101,7 @@ python ui/interface.py
 
 ---
 
-## 📚 8. More Resources
+## 📚 9. More Resources
 
 * [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
