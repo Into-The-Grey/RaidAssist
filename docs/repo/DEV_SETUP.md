@@ -83,7 +83,7 @@ python ui/interface.py
 
 ## 📚 8. More Resources
 
-* [Collaboration Guide](./COLLABORATION.md)
+* [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
 * [CONTRIBUTORS.md](./CONTRIBUTORS.md)
 
