@@ -49,8 +49,8 @@ session.json
 *.db-journal
 
 # App icons and assets (if you want to keep these local/private)
-assets/*.png
-assets/*.ico
+# assets/*.png
+# assets/*.ico
 
 # PyInstaller/cx_Freeze/freeze build outputs
 *.spec
