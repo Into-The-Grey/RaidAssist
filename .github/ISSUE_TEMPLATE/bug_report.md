@@ -1,38 +1,52 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+name: "\U0001F41E Bug report"
+about: Report a problem or unexpected behavior in RaidAssist
+title: "[Bug] <short description>"
+labels: bug
 assignees: ''
+---
+
+## 🐞 Description
+
+<!-- A clear and concise description of what the bug is. What went wrong? -->
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## 🔁 Steps to Reproduce
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. <!-- Step one: e.g., Launch app -->
+2. <!-- Step two: e.g., Click on 'Overlay' -->
+3. <!-- ... -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+---
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## 🤔 Expected Behavior
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+<!-- What did you expect to happen? -->
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+---
 
-**Additional context**
-Add any other context about the problem here.
+## 🖥️ Environment
+
+- **OS**: (Windows/macOS/Linux, version)
+- **Python Version**: (e.g., 3.10)
+- **RaidAssist Version/Commit**: (e.g., v0.1.0-alpha)
+- **Install Method**: (pip, source, etc.)
+
+---
+
+## 📸 Screenshots or Logs
+
+<!-- Attach screenshots, error logs, or crash dumps if applicable -->
+
+---
+
+## 📝 Additional Context
+
+<!-- Any other information or context about the problem -->
+
+---
+
+## 📣 Possible Solution (Optional)
+
+<!-- Suggest a fix or possible reason, if you have one -->
