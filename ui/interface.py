@@ -47,6 +47,19 @@ from ui.settings import SettingsDialog, load_settings
 from ui.loading import LoadingDialog
 from ui.api_tester import ApiTesterDialog
 
+
+def get_asset_path(filename):
+    """
+    Returns the full path to an asset file, regardless of how the app is run.
+    Looks for assets/ folder next to the current file (works in EXE and dev mode).
+    """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(base_dir, "..", "assets")
+    path = os.path.join(assets_dir, filename)
+    # Normalize path (especially for Windows EXE)
+    return os.path.normpath(path)
+
+
 # ---- Logging (Optional, for debugging/future proof) ----
 LOG_PATH = "RaidAssist/logs/interface.log"
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
@@ -57,7 +70,6 @@ logging.basicConfig(
 )
 
 BASE_BUNGIE_URL = "https://www.bungie.net"
-ICON_PATH = "assets/raidassist_icon.png"  # Replace with your actual icon
 
 
 def get_item_info(item_hash, item_defs):
@@ -117,13 +129,13 @@ class RaidAssistUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("RaidAssist - Meta Progression Assistant")
-        if os.path.exists(ICON_PATH):
-            self.setWindowIcon(QIcon(ICON_PATH))
+        self.setWindowIcon(QIcon(get_asset_path("raidassist_icon.png")))
         self.setMinimumWidth(600)
         self.layout = QVBoxLayout()
 
         # System tray icon
-        tray_icon = QIcon(ICON_PATH) if os.path.exists(ICON_PATH) else QIcon()
+        tray_icon_path = get_asset_path("raidassist_icon.png")
+        tray_icon = QIcon(tray_icon_path) if os.path.exists(tray_icon_path) else QIcon()
         self.tray_icon = QSystemTrayIcon(tray_icon)
         self.tray_icon.setToolTip("RaidAssist is running")
         tray_menu = QMenu()
