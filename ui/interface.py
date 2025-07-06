@@ -42,7 +42,7 @@ from api.parse_profile import (
     extract_catalysts,
     extract_exotics,
 )
-from api.manifest import load_item_definitions, get_item_display
+from api.manifest import load_item_definitions
 from ui.settings import SettingsDialog, load_settings
 from ui.loading import LoadingDialog
 from ui.api_tester import ApiTesterDialog
