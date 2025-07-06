@@ -6,7 +6,9 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('assets/*', 'assets'),
+    ('assets/*', 'assets'),
+    ('api/*', 'api'),
+    ('ui/*', 'ui'),
     ],
     hiddenimports=[],
     hookspath=[],
