@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"  # Looks for requirements.txt in project root
     schedule:
-      interval: "weekly"   # You can set to "daily", "monthly", etc.
+      interval: "daily"   # You can set to "daily", "monthly", etc.
     open-pull-requests-limit: 5
     commit-message:
       prefix: "pip"
@@ -16,21 +16,17 @@ updates:
     reviewers:
       - "Into-The-Grey"
     rebase-strategy: "auto"
-    ignore:
-      - dependency-name: "pyside2"
-        # If you want to only update PySide2 manually, uncomment above and remove this comment
+    # Uncomment the lines below if you want to ignore PySide2 updates
+    # ignore:
+    #   - dependency-name: "pyside2"
 
-  - package-ecosystem: "pip"
-    directory: "/"   # Looks for dev-requirements.txt if you add it below
+  # (Optional: Enable this if you use GitHub Actions!)
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: "weekly"
-    # This tells dependabot to look for dev dependencies
-    requirements-file: "dev-requirements.txt"
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "pip"
-      include: "scope"
+      interval: "daily"
     labels:
+      - "github-actions"
       - "dependencies"
       - "python"
     assignees:
@@ -38,14 +34,3 @@ updates:
     reviewers:
       - "Into-The-Grey"
     rebase-strategy: "auto"
-
-  # (Optional: Enable this if you use GitHub Actions!)
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "github-actions"
-      - "dependencies"
-    assignees:
-      - "Into-The-Grey"
