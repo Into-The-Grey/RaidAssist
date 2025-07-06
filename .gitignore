@@ -53,7 +53,7 @@ session.json
 # assets/*.ico
 
 # PyInstaller/cx_Freeze/freeze build outputs
-*.spec
+# *.spec
 output/
 *.exe
 *.app
