@@ -1,15 +1,14 @@
 # raidassist.spec (place in project root)
 block_cipher = None
 
-a = Analysis(
+a = Analysis( # type: ignore
     ['ui/interface.py'],
     pathex=[],
     binaries=[],
     datas=[
     ('assets/*', 'assets'),
     ('api/*', 'api'),
-    ('ui/*', 'ui'),
-    ],
+    ('ui/*', 'ui'),],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -20,8 +19,8 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-exe = EXE(
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher) # type: ignore
+exe = EXE( # type: ignore
     pyz,
     a.scripts,
     [],
@@ -34,7 +33,7 @@ exe = EXE(
     console=False,  # Set to True if you want console window, False for pure GUI
     icon='assets/raidassist_icon.ico',
 )
-coll = COLLECT(
+coll = COLLECT( # type: ignore
     exe,
     a.binaries,
     a.zipfiles,
