@@ -1,3 +1,5 @@
+[![CodeQL Advanced](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml) [![Python CI](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml)
+
 # RaidAssist
 
 **RaidAssist** is a next-generation Destiny 2 desktop companion app and overlay for dedicated players and completionists.
