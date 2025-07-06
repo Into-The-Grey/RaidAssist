@@ -1,0 +1,32 @@
+name: Build Windows EXE (Manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r dev-requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller raidassist.spec
+
+      - name: Upload built EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RaidAssist-Windows
+          path: dist/**
