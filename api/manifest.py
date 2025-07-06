@@ -12,6 +12,20 @@ import requests
 import json
 import logging
 
+
+def get_project_root():
+    """
+    Returns the absolute path to the project root directory.
+    Assumes this file is in RaidAssist/api/ and looks for the parent containing RaidAssist/.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    while current_dir != os.path.dirname(current_dir):  # Stop at filesystem root
+        if os.path.basename(current_dir) == "RaidAssist":
+            return os.path.dirname(current_dir)
+        current_dir = os.path.dirname(current_dir)
+    return os.path.dirname(os.path.dirname(current_dir))  # Fallback
+
+
 # Load .env variables if present
 try:
     from dotenv import load_dotenv # type: ignore
@@ -22,9 +36,9 @@ except ImportError:
 
 BASE_URL = "https://www.bungie.net"
 MANIFEST_URL = f"{BASE_URL}/Platform/Destiny2/Manifest/"
-DEST_DIR = "RaidAssist/cache/manifest"
+DEST_DIR = os.path.join(get_project_root(), "RaidAssist", "cache", "manifest")
 MANIFEST_FILE = os.path.join(DEST_DIR, "DestinyInventoryItemDefinition.json")
-LOG_PATH = "RaidAssist/logs/manifest.log"
+LOG_PATH = os.path.join(get_project_root(), "RaidAssist", "logs", "manifest.log")
 
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 logging.basicConfig(

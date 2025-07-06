@@ -7,8 +7,18 @@ import os
 import logging
 from api.exotics import all_exotics  # Manifest-driven exotic lookup
 
-PROFILE_PATH = "RaidAssist/cache/profile.json"
-LOG_PATH = "RaidAssist/logs/parse_profile.log"
+
+def get_project_root():
+    """
+    Returns the project root directory.
+    Returns:
+        str: Path to the project root directory.
+    """
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+PROFILE_PATH = os.path.join(get_project_root(), "RaidAssist", "cache", "profile.json")
+LOG_PATH = os.path.join(get_project_root(), "RaidAssist", "logs", "parse_profile.log")
 
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 logging.basicConfig(

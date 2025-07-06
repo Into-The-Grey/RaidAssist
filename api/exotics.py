@@ -12,7 +12,9 @@ import os
 import json
 from api.manifest import load_item_definitions
 
-CACHE_PATH = "RaidAssist/cache/exotics_cache.json"
+
+def get_cache_path():
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "RaidAssist", "cache", "exotics_cache.json")
 
 
 def build_exotic_cache():
@@ -43,8 +45,8 @@ def build_exotic_cache():
         except Exception:
             continue
     # Cache to disk for fast reloads
-    os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-    with open(CACHE_PATH, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(get_cache_path()), exist_ok=True)
+    with open(get_cache_path(), "w", encoding="utf-8") as f:
         json.dump(exotics, f, indent=2)
     return exotics
 
@@ -55,8 +57,8 @@ def load_exotic_cache():
     Returns:
         dict: {itemHash: {name, type, class, slot}}
     """
-    if os.path.exists(CACHE_PATH):
-        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+    if os.path.exists(get_cache_path()):
+        with open(get_cache_path(), "r", encoding="utf-8") as f:
             return json.load(f)
     return build_exotic_cache()
 

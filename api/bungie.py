@@ -11,9 +11,16 @@ try:
 except ImportError:
     pass  # Continue if dotenv is not available; fall back to OS/env/hardcoded
 
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+CACHE_DIR = os.path.join(get_project_root(), "RaidAssist", "cache")
+LOG_DIR = os.path.join(get_project_root(), "RaidAssist", "logs")
+SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
+
 # Set up basic logging
-LOG_PATH = "RaidAssist/logs/bungie_api.log"
-os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+LOG_PATH = os.path.join(LOG_DIR, "bungie_api.log")
+os.makedirs(LOG_DIR, exist_ok=True)
 logging.basicConfig(
     filename=LOG_PATH,
     level=logging.INFO,
@@ -23,8 +30,7 @@ logging.basicConfig(
 # Fallback order: .env → OS → hardcoded default
 API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
 
-PROFILE_CACHE_PATH = "RaidAssist/cache/profile.json"
-SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
+PROFILE_CACHE_PATH = os.path.join(CACHE_DIR, "profile.json")
 
 
 def load_token():
@@ -71,7 +77,7 @@ def fetch_profile(membership_type, membership_id):
         resp = requests.get(url, params=params, headers=headers)
         resp.raise_for_status()
         profile = resp.json()
-        os.makedirs(os.path.dirname(PROFILE_CACHE_PATH), exist_ok=True)
+        os.makedirs(CACHE_DIR, exist_ok=True)
         with open(PROFILE_CACHE_PATH, "w") as f:
             json.dump(profile, f, indent=2)
         logging.info(f"Profile fetched and cached for membership_id={membership_id}")
