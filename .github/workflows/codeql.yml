@@ -41,9 +41,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          queries:
-            - security-extended
-            - security-and-quality
+          queries: security-extended,security-and-quality
           # Most secure, gets both bug+security queries
 
       - name: Perform CodeQL Analysis
