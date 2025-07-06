@@ -1,0 +1,63 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [main, develop, feature/**]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '31 15 * * 0'  # Every Sunday at 15:31 UTC
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write   # Required for CodeQL
+      packages: read           # To fetch internal/private packs if needed
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: python
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Optional: setup Python (for future codebase expansion)
+      - name: Set up Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended,security-and-quality
+          # Most secure, gets both bug+security queries
+
+      # (No build step for Python, but kept here for future expansion)
+      - if: matrix.build-mode == 'manual'
+        shell: bash
+        run: |
+          echo 'Manual build step not needed for Python. If you add C/C++, Java, etc., update here.'
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+      # Optional: Upload SARIF results as artifact (advanced/enterprise use only)
+      # - name: Upload SARIF
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: codeql-results
+      #     path: results.sarif
