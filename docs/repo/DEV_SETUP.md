@@ -51,7 +51,19 @@ cd raidassist
 
 ---
 
-## 🚀 4. Running the App
+## 🖼️ 4. Asset Management (NEW)
+
+* All app icons and images now live in the `/assets/` directory.
+* Icons are loaded dynamically using the `get_asset_path()` helper, so asset loading works in dev, EXE, and cross-platform builds.
+* If you add new icons or images, place them in `/assets/` and update code to use the helper:
+
+  ```python
+  icon_path = get_asset_path('raidassist_icon.png')
+  ```
+
+---
+
+## 🚀 5. Running the App
 
 ```bash
 python ui/interface.py
@@ -61,18 +73,19 @@ python ui/interface.py
 
 ---
 
-## 🧪 5. Running Tests
+## 🧪 6. Running Tests
 
 * We use `pytest` for all tests:
 
   ```bash
   pytest
   ```
+
 * Place new tests in the `/tests` folder.
 
 ---
 
-## 🎨 6. Code Formatting and Linting
+## 🎨 7. Code Formatting and Linting
 
 * Format code before PRs:
 
@@ -81,11 +94,12 @@ python ui/interface.py
   isort .
   mypy .
   ```
+
 * Fix lint errors before pushing.
 
 ---
 
-## 🔑 7. Working with Bungie API Keys
+## 🔑 8. Working with Bungie API Keys
 
 * RaidAssist uses a secure, app-owned Bungie API key and OAuth client ID.
 * **Do not share your real key in code, docs, or screenshots.**
@@ -93,7 +107,7 @@ python ui/interface.py
 
 ---
 
-## 💡 8. Tips & Troubleshooting
+## 💡 9. Tips & Troubleshooting
 
 * For manifest or API issues, see `docs/repo/TROUBLESHOOTING.md` (coming soon).
 * Check the [README.md](/README.md) and [ROADMAP.md](./ROADMAP.md) for project context.
@@ -101,7 +115,7 @@ python ui/interface.py
 
 ---
 
-## 📚 9. More Resources
+## 📚 10. More Resources
 
 * [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
