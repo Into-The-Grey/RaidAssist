@@ -4,6 +4,15 @@
 Main UI for RaidAssist Destiny 2 overlay app. Includes dashboard tabs, overlay mode, notifications, API tester, and settings.
 """
 
+import os
+import sys
+
+# Ensure the root project folder is on sys.path for module imports (works in EXE and dev)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
 try:
     from pyqt_hotkey import HotKeyManager  # type: ignore
 except ImportError:
@@ -30,11 +39,9 @@ from PySide2.QtWidgets import (  # type: ignore
 )
 from PySide2.QtGui import QIcon, QPixmap  # type: ignore
 from PySide2.QtCore import QTimer, Qt  # type: ignore
-import sys
 import requests
 import json
 import csv
-import os
 import logging
 from api.parse_profile import (
     load_profile,
