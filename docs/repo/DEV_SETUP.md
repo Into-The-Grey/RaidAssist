@@ -63,7 +63,7 @@ cd raidassist
 
 ---
 
-## 💾 5. Asset & Cache File Reference (NEW)
+## 💾 5. Asset & Cache File Reference
 
 The following files and folders are used or created by RaidAssist at runtime:
 
@@ -82,7 +82,19 @@ The following files and folders are used or created by RaidAssist at runtime:
 
 ---
 
-## 🚀 6. Running the App
+## ♻️ 6. Cache & Log Policy (NEW)
+
+* **Manifest, Profile, and Exotics caches** are created automatically as needed, and can be safely deleted if you encounter corruption or wish to reset app state.
+* **Logs** are kept for debugging and troubleshooting; deleting them does not affect app state.
+* **Settings** are stored in `RaidAssist/config/settings.json` and updated whenever you change options in the UI.
+* **Session tokens** are stored per-user in your home directory, and cleared on logout or by deleting `~/.raidassist/session.json`.
+
+**Note:**
+Currently, you must clear cache and logs manually by deleting the relevant files/folders. A one-click “Clear Cache” button is planned for the UI.
+
+---
+
+## 🚀 7. Running the App
 
 ```bash
 python ui/interface.py
@@ -92,7 +104,7 @@ python ui/interface.py
 
 ---
 
-## 🧪 7. Running Tests
+## 🧪 8. Running Tests
 
 * We use `pytest` for all tests:
 
@@ -104,7 +116,7 @@ python ui/interface.py
 
 ---
 
-## 🎨 8. Code Formatting and Linting
+## 🎨 9. Code Formatting and Linting
 
 * Format code before PRs:
 
@@ -118,7 +130,7 @@ python ui/interface.py
 
 ---
 
-## 🔑 9. Working with Bungie API Keys
+## 🔑 10. Working with Bungie API Keys
 
 * RaidAssist uses a secure, app-owned Bungie API key and OAuth client ID.
 * **Do not share your real key in code, docs, or screenshots.**
@@ -126,7 +138,7 @@ python ui/interface.py
 
 ---
 
-## 💡 10. Tips & Troubleshooting
+## 💡 11. Tips & Troubleshooting
 
 * For manifest or API issues, see `docs/repo/TROUBLESHOOTING.md` (coming soon).
 * Check the [README.md](/README.md) and [ROADMAP.md](./ROADMAP.md) for project context.
@@ -134,7 +146,7 @@ python ui/interface.py
 
 ---
 
-## 📚 11. More Resources
+## 📚 12. More Resources
 
 * [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
