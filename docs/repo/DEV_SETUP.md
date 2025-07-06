@@ -51,7 +51,7 @@ cd raidassist
 
 ---
 
-## 🖼️ 4. Asset Management (NEW)
+## 🖼️ 4. Asset Management
 
 * All app icons and images now live in the `/assets/` directory.
 * Icons are loaded dynamically using the `get_asset_path()` helper, so asset loading works in dev, EXE, and cross-platform builds.
@@ -63,7 +63,26 @@ cd raidassist
 
 ---
 
-## 🚀 5. Running the App
+## 💾 5. Asset & Cache File Reference (NEW)
+
+The following files and folders are used or created by RaidAssist at runtime:
+
+| Path                                  | Purpose                | Created by App? | User Clearable? | Notes                               |
+| ------------------------------------- | ---------------------- | --------------- | --------------- | ----------------------------------- |
+| `assets/raidassist_icon.png`          | UI & tray icon         | No              | No              | Static asset                        |
+| `assets/raidassist_icon.ico`          | EXE icon               | No              | No              | Static asset                        |
+| `RaidAssist/cache/manifest/`          | Destiny manifest cache | Yes             | Yes             | Fetched from Bungie, can be cleared |
+| `RaidAssist/cache/profile.json`       | Profile data cache     | Yes             | Yes             | Refreshed from Bungie API           |
+| `RaidAssist/cache/exotics_cache.json` | Exotic lookup cache    | Yes             | Yes             | Built from manifest, can be cleared |
+| `RaidAssist/logs/*.log`               | App logs               | Yes             | Yes             | Debug/troubleshooting               |
+| `RaidAssist/config/settings.json`     | User/app settings      | Yes             | Yes (planned)   | Written by app/settings UI          |
+| `~/.raidassist/session.json`          | OAuth/session tokens   | Yes             | Yes (logout)    | One per user                        |
+| `.env`                                | API key/config (local) | No              | Yes             | Never committed or shipped          |
+| `.env.example`                        | Env var template       | No              | No              | For devs only                       |
+
+---
+
+## 🚀 6. Running the App
 
 ```bash
 python ui/interface.py
@@ -73,7 +92,7 @@ python ui/interface.py
 
 ---
 
-## 🧪 6. Running Tests
+## 🧪 7. Running Tests
 
 * We use `pytest` for all tests:
 
@@ -85,7 +104,7 @@ python ui/interface.py
 
 ---
 
-## 🎨 7. Code Formatting and Linting
+## 🎨 8. Code Formatting and Linting
 
 * Format code before PRs:
 
@@ -99,7 +118,7 @@ python ui/interface.py
 
 ---
 
-## 🔑 8. Working with Bungie API Keys
+## 🔑 9. Working with Bungie API Keys
 
 * RaidAssist uses a secure, app-owned Bungie API key and OAuth client ID.
 * **Do not share your real key in code, docs, or screenshots.**
@@ -107,7 +126,7 @@ python ui/interface.py
 
 ---
 
-## 💡 9. Tips & Troubleshooting
+## 💡 10. Tips & Troubleshooting
 
 * For manifest or API issues, see `docs/repo/TROUBLESHOOTING.md` (coming soon).
 * Check the [README.md](/README.md) and [ROADMAP.md](./ROADMAP.md) for project context.
@@ -115,7 +134,7 @@ python ui/interface.py
 
 ---
 
-## 📚 10. More Resources
+## 📚 11. More Resources
 
 * [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
