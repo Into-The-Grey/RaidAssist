@@ -8,8 +8,12 @@ import os
 import sys
 
 # Ensure the root project folder is on sys.path for module imports (works in EXE and dev)
-current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if getattr(sys, 'frozen', False):
+    # PyInstaller EXE case
+    base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.abspath(os.path.join(base_dir, ".."))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 

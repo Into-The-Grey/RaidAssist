@@ -4,13 +4,30 @@ settings.py — Settings dialog and config loader for RaidAssist.
 Stores and loads app preferences in JSON.
 """
 
-from PySide2.QtWidgets import QDialog, QVBoxLayout, QLabel, QSpinBox, QPushButton # type: ignore
+from PySide2.QtWidgets import QDialog, QVBoxLayout, QLabel, QSpinBox, QPushButton  # type: ignore
 import json
 import os
 import logging
 
-SETTINGS_PATH = "RaidAssist/config/settings.json"
-# Optionally configure logging here
+
+def get_project_root():
+    """Returns the absolute path to the project root."""
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+SETTINGS_PATH = os.path.join(
+    get_project_root(), "RaidAssist", "config", "settings.json"
+)
+LOG_PATH = os.path.join(get_project_root(), "RaidAssist", "logs", "settings.log")
+
+os.makedirs(os.path.dirname(SETTINGS_PATH), exist_ok=True)
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
 
 
 def load_settings():
@@ -20,8 +37,15 @@ def load_settings():
         dict: Settings dictionary.
     """
     if os.path.exists(SETTINGS_PATH):
-        with open(SETTINGS_PATH, "r") as f:
-            return json.load(f)
+        try:
+            with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+                settings = json.load(f)
+                logging.info("Settings loaded.")
+                return settings
+        except Exception as e:
+            logging.error(f"Failed to load settings: {e}")
+    else:
+        logging.warning("Settings file does not exist.")
     return {"refresh_interval_seconds": 60}
 
 
@@ -30,10 +54,17 @@ def save_settings(settings):
     Saves the provided settings dictionary to disk.
     Args:
         settings (dict): Settings to save.
+    Returns:
+        bool: True if successful, False otherwise.
     """
-    os.makedirs(os.path.dirname(SETTINGS_PATH), exist_ok=True)
-    with open(SETTINGS_PATH, "w") as f:
-        json.dump(settings, f, indent=2)
+    try:
+        with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2)
+        logging.info("Settings saved.")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to save settings: {e}")
+        return False
 
 
 class SettingsDialog(QDialog):
