@@ -6,7 +6,7 @@ Welcome, developer! This guide helps you get your environment ready for RaidAssi
 
 ## 🖥️ 1. System Requirements
 
-* **Python** 3.8 or higher (recommended: 3.10–3.12)
+* **Python** 3.8 (required for PySide2 compatibility)
 * **Git** (for cloning and version control)
 * **OS:** Windows (required for Destiny 2 compatibility; code is cross-platform but only tested on Windows)
 * \[Optional] **Visual Studio Code** or your favorite code editor
@@ -29,6 +29,8 @@ cd raidassist
    ```bash
    pip install -r requirements.txt
    ```
+
+   > **Note:** Hotkey support requires `pyqthotkey>=1.0.4` (now specified in `requirements.txt`).
 
 2. **Developer tools:**
 
@@ -82,7 +84,7 @@ The following files and folders are used or created by RaidAssist at runtime:
 
 ---
 
-## ♻️ 6. Cache & Log Policy (NEW)
+## ♻️ 6. Cache & Log Policy
 
 * **Manifest, Profile, and Exotics caches** are created automatically as needed, and can be safely deleted if you encounter corruption or wish to reset app state.
 * **Logs** are kept for debugging and troubleshooting; deleting them does not affect app state.
@@ -106,7 +108,7 @@ python ui/interface.py
 
 ## 🧪 8. Running Tests
 
-* We use `pytest` for all tests:
+* Automated tests are currently a placeholder to keep CI passing. Real test coverage is planned as the project evolves.
 
   ```bash
   pytest
