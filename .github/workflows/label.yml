@@ -1,0 +1,34 @@
+# .github/workflows/labeler.yml
+
+name: Labeler
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out the code – technically optional for labeler, but enables future extensibility (lint, coverage, etc.)
+      - name: Checkout code (optional)
+        uses: actions/checkout@v4
+
+      # Apply labels as defined in .github/labeler.yml
+      - name: Run Labeler
+        uses: actions/labeler@v4
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      # Optionally, you could add a step to comment if no label was added or provide other guidance.
+      # (Advanced usage: not required unless you want to notify users.)
+
+# Notes:
+# - Using `pull_request_target` allows labeler to work on PRs from forks (safer for public repos).
+# - The explicit `types` ensure the action runs on every relevant PR event.
+# - If you ever want to use labeler on issues as well, add `issues` to `on:` (but that's not typical).

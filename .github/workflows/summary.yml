@@ -1,0 +1,44 @@
+# .github/workflows/summarize-issue.yml
+
+name: Summarize new issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write        # Needed to comment on issues
+  models: read         # For AI inference (actions/ai-inference)
+  contents: read       # For repo access
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Summarize issue with AI
+        id: inference
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            Summarize the following GitHub issue in one concise paragraph for a project maintainer. If the issue is not clear or lacks detail, note this.
+            ---
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+      - name: Add AI summary as a comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "${{ steps.inference.outputs.response }}"
+
+# Notes:
+# - This will add a one-paragraph AI summary as the **first comment** on every new issue.
+# - The summary can be customized further by editing the prompt.
+# - You can change the trigger (for example, only summarize bug/feature issues).
+# - Ensure 'actions/ai-inference' is enabled for your org/repo and you have access to 'models: read'.
+# - GitHub CLI (`gh`) is pre-installed on Ubuntu runners, so no need for a separate install step.

@@ -1,0 +1,77 @@
+# .github/workflows/greetings.yml
+
+name: Greetings
+
+on:
+  pull_request_target:
+    types: [opened]
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Welcomes first-time contributors on their first PR or issue
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 **Welcome to the RaidAssist project!**
+
+            Thanks for opening your first issue!
+
+            {% if 'bug' in issue.labels %}
+            🐞 **Bug Report Guide**
+            - Please include steps to reproduce the issue.
+            - Attach screenshots or logs if possible.
+            - Confirm you’ve checked the [open issues](../issues) to avoid duplicates.
+            {% elsif 'feature' in issue.labels %}
+            🚀 **Feature Request Guide**
+            - Clearly describe the feature or improvement you’re suggesting.
+            - Explain why it’s useful for you (and others!).
+            - Feel free to include sketches or mockups.
+            {% else %}
+            💡 **General Feedback / Questions**
+            - Thanks for sharing your feedback or question.
+            - A maintainer will reply soon. If urgent, ping us on [Discord](https://discord.gg/your-invite-code).
+            {% endif %}
+
+            📚 Resources:  
+            - [README](../blob/main/README.md)  
+            - [Contributing Guide](../blob/main/docs/repo/CONTRIBUTING.md)  
+            - [Code of Conduct](../blob/main/docs/repo/CODE_OF_CONDUCT.md)  
+            - [Feature/Bug Templates](../blob/main/.github/ISSUE_TEMPLATE/)
+
+            🚨 Please keep discussions constructive and on-topic!
+
+          pr-message: |
+            👋 **Thank you for your first pull request!**
+
+            Please review this checklist before requesting a review:
+
+            - [ ] The code follows the [project style guide](../blob/main/docs/repo/CONTRIBUTING.md)
+            - [ ] The PR description is clear and complete
+            - [ ] Linked to any relevant issues (`Fixes #123`)
+            - [ ] Automated checks are passing (CodeQL, lint, etc.)
+            - [ ] Screenshots or videos provided if the UI changed
+
+            📚 Resources:
+            - [Contributing Guide](../blob/main/docs/repo/CONTRIBUTING.md)
+            - [Roadmap](../blob/main/docs/repo/ROADMAP.md)
+
+            💬 Want faster feedback? Join us on [Discord](https://discord.gg/your-invite-code) or mention a maintainer.
+
+            We really appreciate your contribution!  
+            _You’re helping make RaidAssist better for everyone._ 🚀
+
+# Tips:
+# - The `{% if ... %}` blocks use GitHub's built-in variable support, but **actions/first-interaction@v1** does not natively support this.
+#   If you want truly conditional messages, you’d need a custom action or a bot (like [actions/label-commenter](https://github.com/peaceiris/actions-label-commenter)).
+# - The above gives a great template for future upgrade, or just use one detailed message for now.
+# - Always keep Discord/community invites up-to-date!
