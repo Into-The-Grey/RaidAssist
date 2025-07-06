@@ -41,22 +41,22 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          queries: security-extended,security-and-quality
+          queries:
+            - security-extended
+            - security-and-quality
           # Most secure, gets both bug+security queries
-
-      # (No build step for Python, but kept here for future expansion)
-      - if: matrix.build-mode == 'manual'
-        shell: bash
-        run: |
-          echo 'Manual build step not needed for Python. If you add C/C++, Java, etc., update here.'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
+          category: "language:${{matrix.language}}"
 
       # Optional: Upload SARIF results as artifact (advanced/enterprise use only)
       # - name: Upload SARIF
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: codeql-results
+      #     path: results.sarif
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: codeql-results
