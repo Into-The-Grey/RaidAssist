@@ -6,3 +6,4 @@ python-dotenv>=1.0.0
 # flake8 or pylint if you want extra linting
 # flake8>=7.0.0
 # pylint>=3.0.0
+pyinstaller

@@ -31,7 +31,6 @@ cd raidassist
    ```
 
    > **Note:** Hotkey support requires `pyqthotkey>=1.0.4` (now specified in `requirements.txt`).
-
 2. **Developer tools:**
 
    ```bash
@@ -96,7 +95,7 @@ Currently, you must clear cache and logs manually by deleting the relevant files
 
 ---
 
-## 🚀 7. Running the App
+## 🚀 7. Running the App (Developer Mode)
 
 ```bash
 python ui/interface.py
@@ -106,7 +105,39 @@ python ui/interface.py
 
 ---
 
-## 🧪 8. Running Tests
+## 🪟 8. Building & Running as a Windows EXE
+
+You can build a self-contained Windows executable for easy distribution:
+
+1. **Install PyInstaller** (already in `dev-requirements.txt`):
+
+   ```bash
+   pip install pyinstaller
+   ```
+
+2. **Create the EXE**:
+
+   ```bash
+   pyinstaller --noconfirm --windowed --icon=assets/raidassist_icon.ico ui/interface.py
+   ```
+
+   * Or, for maximum control, use a [PyInstaller spec file](https://pyinstaller.org/en/stable/spec-files.html) to include assets and custom config (see `/raidassist.spec` if provided).
+3. **Find the output:**
+
+   * The EXE and all assets will appear in `dist/interface/` by default.
+4. **Distribute:**
+
+   * Copy the EXE and the `assets/` directory (if not bundled via spec) to your target system.
+   * **Users must provide their own `.env` file (never distribute yours!).**
+
+**Troubleshooting:**
+
+* If you get missing DLL or asset errors, make sure all dependencies and assets are present in the EXE’s folder.
+* Check that your `.env` file is present and configured.
+
+---
+
+## 🧪 9. Running Tests
 
 * Automated tests are currently a placeholder to keep CI passing. Real test coverage is planned as the project evolves.
 
@@ -118,7 +149,7 @@ python ui/interface.py
 
 ---
 
-## 🎨 9. Code Formatting and Linting
+## 🎨 10. Code Formatting and Linting
 
 * Format code before PRs:
 
@@ -132,7 +163,7 @@ python ui/interface.py
 
 ---
 
-## 🔑 10. Working with Bungie API Keys
+## 🔑 11. Working with Bungie API Keys
 
 * RaidAssist uses a secure, app-owned Bungie API key and OAuth client ID.
 * **Do not share your real key in code, docs, or screenshots.**
@@ -140,7 +171,7 @@ python ui/interface.py
 
 ---
 
-## 💡 11. Tips & Troubleshooting
+## 💡 12. Tips & Troubleshooting
 
 * For manifest or API issues, see `docs/repo/TROUBLESHOOTING.md` (coming soon).
 * Check the [README.md](/README.md) and [ROADMAP.md](./ROADMAP.md) for project context.
@@ -148,7 +179,7 @@ python ui/interface.py
 
 ---
 
-## 📚 12. More Resources
+## 📚 13. More Resources
 
 * [Collaboration Guide](./CONTRIBUTING.md)
 * [Code of Conduct](./CODE_OF_CONDUCT.md)
