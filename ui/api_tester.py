@@ -4,7 +4,7 @@ api_tester.py — Bungie API call tester dialog for RaidAssist.
 Allows power users to send requests to any Bungie API endpoint and view/save the response.
 """
 
-from PySide2.QtWidgets import ( # type: ignore
+from PySide2.QtWidgets import (  # type: ignore
     QDialog,
     QVBoxLayout,
     QHBoxLayout,
@@ -19,10 +19,36 @@ import json
 import os
 import logging
 
-SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
-API_KEY = os.environ.get("BUNGIE_API_KEY", "YOUR_BUNGIE_API_KEY")
+try:
+    from dotenv import load_dotenv  # type: ignore
+except ImportError:
+    load_dotenv = None
 
-# Optionally configure logging here if desired
+# ---- Logging setup ----
+LOG_PATH = os.path.expanduser("~/.raidassist/api_tester.log")
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+# ---- Environment variable loading ----
+if load_dotenv is not None:
+    env_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"
+    )
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+    else:
+        logging.warning(
+            ".env file not found in project root; falling back to environment variables."
+        )
+
+SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
+API_KEY = os.environ.get(
+    "BUNGIE_API_KEY", "YOUR_BUNGIE_API_KEY"
+)  # Should always be set via .env
 
 
 def load_token():
@@ -32,8 +58,11 @@ def load_token():
         str: OAuth access token, or empty string if not found.
     """
     if os.path.exists(SESSION_PATH):
-        with open(SESSION_PATH, "r") as f:
-            return json.load(f).get("access_token", "")
+        try:
+            with open(SESSION_PATH, "r") as f:
+                return json.load(f).get("access_token", "")
+        except Exception as e:
+            logging.error(f"Failed to load OAuth token: {e}")
     return ""
 
 
@@ -79,16 +108,21 @@ class ApiTesterDialog(QDialog):
         token = load_token()
         if token:
             headers["Authorization"] = f"Bearer {token}"
+        logging.info(f"Sending GET to {url} (auth: {'yes' if token else 'no'})")
         try:
             r = requests.get(url, headers=headers)
+            r.raise_for_status()
             try:
                 data = r.json()
                 pretty = json.dumps(data, indent=2)
             except Exception:
                 pretty = r.text
             self.result_view.setPlainText(pretty)
+            logging.info(f"API {endpoint} success, {len(pretty)} chars.")
         except Exception as e:
-            self.result_view.setPlainText(f"Error: {e}")
+            error_msg = f"Error: {e}"
+            self.result_view.setPlainText(error_msg)
+            logging.error(f"API {endpoint} error: {e}")
 
     def save_result(self):
         """
@@ -104,5 +138,7 @@ class ApiTesterDialog(QDialog):
             try:
                 with open(fname, "w", encoding="utf-8") as f:
                     f.write(self.result_view.toPlainText())
+                logging.info(f"Saved API result to {fname}")
             except Exception as e:
                 self.result_view.append(f"\nSave error: {e}")
+                logging.error(f"Failed to save result: {e}")
