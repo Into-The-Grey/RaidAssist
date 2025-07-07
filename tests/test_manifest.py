@@ -49,13 +49,24 @@ def test_manifest_download_and_load(tmp_path):
 
 def test_get_item_display():
     item_defs = manifest.load_item_definitions()
-    # Pick a known weapon hash for testing (e.g., Ace of Spades: 1256108509)
-    ace_hash = 1256108509
-    name = manifest.get_item_display(ace_hash, item_defs)
+    
+    # If manifest is empty, skip this test
+    if not item_defs:
+        pytest.skip("Manifest is empty, cannot test item display")
+    
+    # Test with any available item from the manifest
+    first_hash = next(iter(item_defs))
+    name = manifest.get_item_display(first_hash, item_defs)
     assert isinstance(name, str)
-    # The result should not be an 'Unknown Item' unless manifest is missing
-    if len(item_defs) > 0:
-        assert "Ace of Spades" in name or "Unknown Item" not in name
+    
+    # Should not be empty and should not be "Unknown Item" since we're using a valid hash
+    assert len(name) > 0
+    assert not name.startswith("Unknown Item")
+    
+    # Test with an invalid hash that definitely won't exist
+    invalid_hash = "99999999999"
+    unknown_name = manifest.get_item_display(invalid_hash, item_defs)
+    assert "Unknown Item" in unknown_name
 
 
 @pytest.mark.skipif(
