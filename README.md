@@ -95,8 +95,8 @@ See our [Code of Conduct](/docs/repo/CODE_OF_CONDUCT.md).
 
 ## 📝 License
 
-This project is licensed under the Apache License 2.0.
-See [LICENSE](/docs/repo/LICENSE) for details.
+This project is licensed under the GNU General Public License.
+See [LICENSE](LICENSE) for details.
 
 ---
 
