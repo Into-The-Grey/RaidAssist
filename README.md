@@ -2,110 +2,114 @@
 
 # RaidAssist
 
-**RaidAssist** is a next-generation Destiny 2 desktop companion app and overlay for dedicated players and completionists.
-Built for PC, RaidAssist puts your meta progress, catalysts, exotics, and crafting at your fingertips—**without alt-tabbing**.
+**RaidAssist** is a next-generation Destiny 2 desktop companion app and overlay for completionists, hardcore players, and Guardians who never want to alt-tab. It runs on Windows and is fully open source.
 
 ---
 
-## ✨ Features (Alpha)
+## ✨ Features (Alpha: v0.1.0)
 
-* **Dashboard Tabs:** Instantly see all your Red Border weapons, Catalyst progress, and Exotic collection in a clean interface.
-* **Search & Filter:** Quickly find any item across your collection.
-* **Overlay Mode:** One-click, always-on-top overlay for live progress tracking while you play. Move and adjust transparency as you like.
-* **Global Hotkey:** Toggle the overlay in and out with Ctrl+Alt+O (configurable in future).
-* **System Tray Integration:** Minimize to tray, with menu and desktop notifications for milestones (pattern/catalyst/exotic completion).
-* **Tooltips:** Hover any item for manifest-backed details—archetype, ammo, description, and more.
-* **API Tester:** Run Bungie API calls right from the app for power users and debugging.
-* **Auto-Refresh & Settings:** Keep data up-to-date automatically, with refresh interval control.
-* **Data Export:** Export your current progress (JSON/CSV) for analysis or sharing.
+* **Dashboard Tabs** — See all your Red Border weapons, Catalyst progress, and Exotic collection at a glance. Manifest-driven and auto-cached.
+* **Search & Filter** — Quickly search your entire progress and filter by any keyword.
+* **Overlay Mode** — One-click, always-on-top overlay for live progress tracking while you play. Move and adjust transparency as you like.
+* **Global Hotkey** — Toggle the overlay (Ctrl+Alt+O by default; more customization coming).
+* **System Tray Integration** — Minimize to tray, receive pop-up desktop notifications for completion milestones.
+* **Tooltips** — Manifest-powered tooltips on every item: archetype, ammo, type, and description.
+* **API Tester** — Built-in API test tool for Bungie endpoints, including OAuth token handling and pretty-printed responses.
+* **Auto-Refresh & Settings** — Set your own refresh interval; data stays up-to-date automatically.
+* **Export** — Save your current progress (JSON/CSV) for backup, theorycrafting, or sharing.
+* **Portable by design** — All settings, logs, and caches are stored locally for easy backup and resets.
 
 ---
 
 ## 🛡️ Bungie API Authentication
 
-RaidAssist uses an official, app-owned Bungie API key to connect securely to Bungie.net—just like DIM, Braytech, and other trusted Destiny 2 apps.  
-**You never need to register your own API key or developer account.**
+RaidAssist uses an official, app-owned Bungie API key (like DIM and Braytech). You never need to register your own developer account or API key.
 
-* On first run, RaidAssist will ask you to log in with your Bungie account via OAuth.
-* Your credentials are never stored; only a temporary session token is saved (locally, never uploaded).
-* All communication is handled via the app's API key, so setup is instant and hassle-free.
+* On first run, you'll log in with your Bungie account via secure OAuth.
+* Only a session token is stored locally; your credentials are never kept or shared.
+* All API requests go through the official app key. **No user registration or API key copying required.**
 
-**FAQ:**  
+**FAQ:**
 
-* "Will this get me banned?" — No. Using the official Bungie API and OAuth is fully supported, just like Destiny Item Manager and Braytech.
-* "Is my data private?" — Yes. Only your own OAuth token is stored locally, and never shared.
-
----
-
-## 🚧 Status: v0.1.0-alpha
-
-This is an **alpha release** for testers, early adopters, and feedback.
-Features are stable, but bugs and quirks may exist.
-Major expansions (see below) are in progress.
+* *Is this safe? Will I get banned?* — Yes, it's safe. RaidAssist uses the public, documented API flows Bungie allows.
+* *Is my data private?* — Yes. Everything is local-only unless you choose to export/share it.
 
 ---
 
-## 🔥 Roadmap / Upcoming Features
+## 🚧 Project Status & Alpha Notice
 
-Planned and premium features include:
+**Alpha Release v0.1.0** — For early adopters, testers, and feedback. Stable core, but you may encounter bugs or edge cases.
 
-* **Multi-account support**
-* **Full raid, dungeon, and activity tracking**
-* **Custom overlay widgets & layout**
-* **Weekly milestones and vendor rotation**
-* **Cloud sync & mobile/web dashboard**
-* **Discord/social integration**
-* **Loadout management & recommendations**
-* **More notifications & advanced stats**
-
-See the [Roadmap](/docs/repo/ROADMAP.md) for details.
+* *Self-contained Python app, with EXE installer in progress.*
+* *Full roadmap and premium features (below) are on the way.*
 
 ---
 
-## 🛠️ How to Use / Install
+## 🔥 Roadmap: Upcoming Features
+
+See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
+
+* Multi-account/profile support
+* Complete raid, dungeon, and activity tracking
+* Custom overlay widgets & layouts
+* Weekly milestones and vendor rotation
+* Cloud sync and mobile/web dashboard
+* Discord/social integrations
+* Loadout management, recommendations, and builds
+* Enhanced stats, milestone popups, and more
+
+---
+
+## 🛠️ Installation & Quick Start
 
 1. **Requirements:**
 
-   * Python 3.8+
-   * See [requirements.txt](/requirements.txt) for dependencies (`PySide2`, `requests`, `pyqt-hotkey`).
-
-2. **Running the App:**
+   * Python 3.8+ (required for PySide2 compatibility)
+   * Windows (required for Destiny 2 compatibility)
+   * See [requirements.txt](/requirements.txt) for dependencies (PySide2, requests, pyqthotkey)
+2. **Install:**
 
    ```bash
    pip install -r requirements.txt
+   ```
+
+3. **First run:**
+
+   ```bash
    python ui/interface.py
    ```
 
-   *(Installer/exe coming soon)*
+   *(Follow the prompt to log in with Bungie; no extra setup required.)*
+
+> **Installer/EXE coming soon.**
 
 ---
 
-## 🤝 How to Contribute
+## 🧑‍💻 Developer Info & Contributing
 
-Check out our [Collaboration Guide](/docs/repo/CONTRIBUTING.md) for dev setup, code standards, and submitting PRs.
+* See [Developer Setup Guide](./DEVELOPER_SETUP.md) for full environment and local build steps.
+* [Collaboration Guide](./CONTRIBUTING.md) for PR/branch guidelines and community expectations.
+* [Code of Conduct](./CODE_OF_CONDUCT.md) for behavior and inclusion.
 
----
-
-## 💬 Code of Conduct
-
-We are committed to a welcoming, inclusive community.
-See our [Code of Conduct](/docs/repo/CODE_OF_CONDUCT.md).
+All app logic, cache, and logs are stored in `/RaidAssist/` folders—see [Developer Guide](./DEVELOPER_SETUP.md) for asset/cache structure.
 
 ---
 
 ## 📝 License
 
-This project is licensed under the GNU General Public License.
-See [LICENSE](LICENSE) for details.
+**GPL v3.0** — See [LICENSE](LICENSE) for full terms and header requirements.
+Free, open-source, and copyleft: you can use, copy, and fork, but must preserve license and attribution.
 
 ---
 
-## Screenshots
+## 📷 Screenshots
 
 ![Dashboard Screenshot](docs/images/dashboard.png)
 ![Overlay Demo GIF](docs/images/overlay-demo.gif)
 
 ---
 
-**Have feedback, bug reports, or feature requests?**
-Open an issue or join our community—every suggestion helps shape RaidAssist!
+**Questions, bugs, or feature ideas?**
+
+* Open an [issue](https://github.com/Into-The-Grey/RaidAssist/issues)
+* PRs and suggestions welcome!
