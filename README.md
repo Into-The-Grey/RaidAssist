@@ -1,4 +1,8 @@
-[![CodeQL Advanced](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml) [![Python CI](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml)
+[![CodeQL Advanced](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/codeql.yml)
+[![Python CI](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml/badge.svg)](https://github.com/Into-The-Grey/RaidAssist/actions/workflows/python-tests.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Open Source](https://badgen.net/badge/open/source/blue?icon=github)](https://github.com/Into-The-Grey/RaidAssist)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue?logo=windows)](https://github.com/Into-The-Grey/RaidAssist)
 
 # RaidAssist
 
@@ -6,7 +10,7 @@
 
 ---
 
-## ✨ Features (Alpha: v0.1.0)
+## ✨ Features (Alpha: v0.2.0)
 
 * **Dashboard Tabs** — See all your Red Border weapons, Catalyst progress, and Exotic collection at a glance. Manifest-driven and auto-cached.
 * **Search & Filter** — Quickly search your entire progress and filter by any keyword.
@@ -25,23 +29,29 @@
 
 RaidAssist uses an official, app-owned Bungie API key (like DIM and Braytech). You never need to register your own developer account or API key.
 
-* On first run, you'll log in with your Bungie account via secure OAuth.
+* On first run, you'll log in with your Bungie account via secure OAuth. A window will pop up for you to approve access to your Destiny 2 profile.
 * Only a session token is stored locally; your credentials are never kept or shared.
 * All API requests go through the official app key. **No user registration or API key copying required.**
+* **OAuth redirect:** RaidAssist uses a secure, self-hosted HTTPS callback on `https://localhost:7777/callback` to handle authentication—no external server required. Self-signed SSL certificates are included for this purpose.
 
 **FAQ:**
 
 * *Is this safe? Will I get banned?* — Yes, it's safe. RaidAssist uses the public, documented API flows Bungie allows.
 * *Is my data private?* — Yes. Everything is local-only unless you choose to export/share it.
+* *Why do I see a browser SSL warning?* — The included `localhost.pem` cert is self-signed, so your browser may show a warning when authenticating. This is normal and safe for local use.
+
+#### Note on SSL Certificates
+
+This project includes `localhost.pem` and `localhost-key.pem` for local OAuth authentication with Bungie. These are self-signed and only used for development/testing. End users do **not** need to manage certificates or secrets.
 
 ---
 
 ## 🚧 Project Status & Alpha Notice
 
-**Alpha Release v0.1.0** — For early adopters, testers, and feedback. Stable core, but you may encounter bugs or edge cases.
+**Alpha Release v0.2.0** — For early adopters, testers, and feedback. Stable core, but you may encounter bugs or edge cases.
 
-* *Self-contained Python app, with EXE installer in progress.*
-* *Full roadmap and premium features (below) are on the way.*
+* Self-contained Python app, with EXE installer and auto-authentication (no manual .env required for users!)
+* Full roadmap and premium features (below) are on the way.
 
 ---
 
@@ -67,6 +77,7 @@ See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
    * Python 3.8+ (required for PySide2 compatibility)
    * Windows (required for Destiny 2 compatibility)
    * See [requirements.txt](/requirements.txt) for dependencies (PySide2, requests, pyqthotkey)
+
 2. **Install:**
 
    ```bash
@@ -79,9 +90,9 @@ See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
    python ui/interface.py
    ```
 
-   *(Follow the prompt to log in with Bungie; no extra setup required.)*
+   *(Follow the prompt to log in with Bungie; no extra setup required. EXE releases available as artifacts.)*
 
-> **Installer/EXE coming soon.**
+> **Installer/EXE included in releases and Actions artifacts.**
 
 ---
 

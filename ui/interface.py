@@ -27,9 +27,9 @@ import os
 import sys
 
 # Ensure the root project folder is on sys.path for module imports (works in EXE and dev)
-if getattr(sys, 'frozen', False):
+if getattr(sys, "frozen", False):
     # PyInstaller EXE case
-    base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    base_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 else:
     base_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.abspath(os.path.join(base_dir, ".."))
@@ -72,6 +72,7 @@ from api.parse_profile import (
     extract_catalysts,
     extract_exotics,
 )
+from api.bungie import ensure_authenticated
 from api.manifest import load_item_definitions
 from ui.settings import SettingsDialog, load_settings
 from ui.loading import LoadingDialog
@@ -158,6 +159,14 @@ class RaidAssistUI(QWidget):
 
     def __init__(self):
         super().__init__()
+        if not ensure_authenticated():
+            QMessageBox.critical(
+                self,
+                "Authentication Required",
+                "Login to Bungie is required to use RaidAssist.\nPlease restart the app after logging in.",
+            )
+            sys.exit(1)
+
         self.setWindowTitle("RaidAssist - Meta Progression Assistant")
         self.setWindowIcon(QIcon(get_asset_path("raidassist_icon.png")))
         self.setMinimumWidth(600)

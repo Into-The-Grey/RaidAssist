@@ -1,3 +1,5 @@
 PySide2>=5.15.2
 pyqthotkey>=1.0.4
 requests>=2.25.0
+flask>=2.0
+python-dotenv

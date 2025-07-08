@@ -7,20 +7,54 @@ jobs:
   build-exe:
     runs-on: windows-latest
 
+    env:
+      # Inject secrets as env variables—NEVER store in repo or .env
+      BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
+      BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
+      BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
+      BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/dev-requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
 
+      - name: Upgrade pip and wheel
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
           pip install -r dev-requirements.txt
           pip install pyinstaller
+
+      - name: Check required secrets
+        run: |
+          if [ -z "${BUNGIE_API_KEY}" ] || [ -z "${BUNGIE_CLIENT_ID}" ] || [ -z "${BUNGIE_CLIENT_SECRET}" ] || [ -z "${BUNGIE_REDIRECT_URI}" ]; then
+            echo "Missing required secrets. Build failed."
+            exit 1
+          fi
+        shell: bash
+
+      - name: Verify secrets for build
+        run: |
+          echo "BUNGIE_API_KEY=${{ secrets.BUNGIE_API_KEY }}"
+          echo "BUNGIE_CLIENT_ID=${{ secrets.BUNGIE_CLIENT_ID }}"
+          echo "BUNGIE_CLIENT_SECRET=${{ secrets.BUNGIE_CLIENT_SECRET }}"
+          echo "BUNGIE_REDIRECT_URI=${{ secrets.BUNGIE_REDIRECT_URI }}"
 
       - name: Build with PyInstaller
         run: pyinstaller raidassist.spec
@@ -30,3 +64,10 @@ jobs:
         with:
           name: RaidAssist-Windows
           path: dist/**
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Logs
+          path: RaidAssist/logs/

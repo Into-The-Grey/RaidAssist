@@ -28,7 +28,7 @@ Usage:
 
 import os
 import logging
-from api.bungie import fetch_profile
+from api.bungie import fetch_profile, ensure_authenticated
 
 # Optional: log to file if desired
 LOG_PATH = "RaidAssist/logs/main.log"
@@ -40,6 +40,11 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
+    # Check authentication before proceeding
+    if not ensure_authenticated():
+        print("Authentication required. Please log in to Bungie to continue.")
+        exit(1)
+
     # Set these with environment variables or direct assignment
     membership_type = os.environ.get(
         "MEMBERSHIP_TYPE", 3
