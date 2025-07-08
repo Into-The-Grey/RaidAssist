@@ -12,6 +12,11 @@ jobs:
     permissions:
       contents: read
       actions: read
+    env:
+      BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
+      BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
+      BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
+      BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
     steps:
       - uses: actions/checkout@v4
 
