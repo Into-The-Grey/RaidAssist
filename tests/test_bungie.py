@@ -18,6 +18,8 @@ def test_load_token(tmp_path, monkeypatch):
 def test_load_token_missing(monkeypatch):
     # Patch SESSION_PATH to non-existent
     monkeypatch.setattr(bungie, "SESSION_PATH", "/non/existent/file.json")
+    # Patch prompt_for_oauth_token to avoid real OAuth
+    monkeypatch.setattr(bungie, "prompt_for_oauth_token", lambda: None)
     assert bungie.load_token() is None
 
 
