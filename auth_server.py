@@ -3,6 +3,7 @@ import logging
 import threading
 import webbrowser
 from flask import Flask, request # type: ignore
+import html
 
 LOG_PATH = os.path.join(
     os.path.dirname(__file__), "RaidAssist", "logs", "auth_server.log"
@@ -26,7 +27,7 @@ def callback():
         logging.error(f"OAuth error: {error}")
         return (
             "<h3>Authentication failed.</h3>"
-            f"<p>Error from Bungie: <b>{error}</b></p>",
+            f"<p>Error from Bungie: <b>{html.escape(error)}</b></p>",
             400,
         )
     if not code:
