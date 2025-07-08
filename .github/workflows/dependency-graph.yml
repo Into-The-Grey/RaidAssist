@@ -21,4 +21,5 @@ jobs:
           pip install -r requirements.txt
           pip install -r dev-requirements.txt
       - name: Submit Python dependencies to GitHub Dependency Graph
+        if: github.event_name == 'pull_request'
         uses: actions/dependency-review-action@v4
