@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RaidAssist"
+version = "0.2.0-alpha"
+description = "A Destiny 2 overlay and desktop app for meta progression and completionists."
+authors = [
+    { name = "Nicholas Acord", email = "ncacord@protonmail.com" }
+]
+license = { text = "GPL-3.0-only" }
+dependencies = [
+    "PySide2>=5.15.0",
+    "requests>=2.25.0",
+    "python-dotenv>=1.0.0",
+    "pyqthotkey>=1.0.4"
+]
+requires-python = ">=3.8"
+readme = "README.md"
