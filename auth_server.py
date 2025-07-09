@@ -24,7 +24,8 @@ def callback():
     code = request.args.get("code")
     error = request.args.get("error")
     if error:
-        logging.error(f"OAuth error: {error}")
+        sanitized_error = error.replace('\n', '').replace('\r', '')
+        logging.error(f"OAuth error: {sanitized_error}")
         return (
             "<h3>Authentication failed.</h3>"
             f"<p>Error from Bungie: <b>{html.escape(error)}</b></p>",
@@ -71,5 +72,6 @@ def get_auth_code(auth_url, ssl_context=None, timeout=180):
             logging.error("OAuth code wait timed out.")
             raise TimeoutError("OAuth flow timed out. Please try again.")
     if "error" in received_code:
-        raise RuntimeError(f"Auth server error: {received_code['error']}")
+        sanitized_error = received_code["error"].replace('\n', '').replace('\r', '')
+        raise RuntimeError(f"Auth server error: {sanitized_error}")
     return received_code["code"]
