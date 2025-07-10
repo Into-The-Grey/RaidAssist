@@ -1,5 +1,60 @@
 # Changelog
 
+## [v0.3.0-alpha] — 2025-07-10
+
+### Major Updates
+
+- **Seamless OAuth Flow:**
+  - No more .env required for end-users. App now launches OAuth login automatically in the browser and handles all Bungie authentication/refresh flows without manual setup.
+  - Full Bungie API secrets handled via GitHub Actions for build security (not bundled in repo).
+
+- **Production-Ready OAuth Redirect:**
+  - Local secure Flask server added to capture OAuth redirect/callback and auto-fetch/refresh access tokens.
+  - SSL certificate management for localhost HTTPS included out-of-the-box for Windows builds.
+
+- **EXE Packaging Improvements:**
+  - Environment variables injected at build-time, never exposed in binary or source.
+  - Logs and cache files cleaned up and auto-created as needed.
+  - Improved PyInstaller spec, modern app icon, and assets handling.
+
+- **User-Friendly Onboarding:**
+  - No first-run errors about missing .env, manifest, or settings.
+  - Friendly error/status handling—users are always prompted to log in if a token is missing or expired.
+
+- **CI/CD Upgrades:**
+  - All CI now runs on Python 3.8 for compatibility with PySide2.
+  - Auth secrets passed securely from repo settings to builds (never in source).
+
+### Infrastructure / Developer Changes
+
+- **Refactored Auth Handling:**
+  - Central auth_server.py for OAuth, with reusable token logic.
+  - Docs, README, and setup guides updated for non-developer users (no key setup).
+
+- **SSL for Local OAuth:**
+  - Example localhost SSL certs (localhost.pem, localhost-key.pem) included for smoother auth in Windows production builds.
+
+- **Test & GH Action Fixes:**
+  - Python CI, build, and badge workflows updated to always use Python 3.8.
+  - Minor test code fixes for new token flow.
+
+### Visual / UI
+
+- **Style Modernization Roadmap:**
+  - Added guidance and palette for modern Qt Fusion/Dark UI, with color and stylesheet examples.
+  - First steps toward "Destiny-style" dashboard look and feel.
+
+### Other
+
+- All logging made more robust with clearer error messages.
+- Many code cleanup and dependency bump fixes.
+- Docs and sample config updates.
+
+**This alpha adds the first seamless user experience—no more setup headaches, just launch, log in, and play!  
+Thanks for all feedback and bug reports—keep them coming as we head toward public beta!**
+
+---
+
 ## [v0.1.0-alpha] — 2025-07-07
 
 ### Major Features
