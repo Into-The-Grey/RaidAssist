@@ -3,7 +3,7 @@
 PySide2>=5.15.2
 
 # Enhanced features
-pyqt-hotkey
+keybind
 
 # API and networking
 requests>=2.25.0
