@@ -17,25 +17,13 @@ jobs:
       BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
       BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
       BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
-    
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/dev-requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: '3.8'  # Use Python 3.8 for compatibility
 
       - name: Install dependencies
         run: |
@@ -62,8 +50,7 @@ jobs:
         run: |
           python -m pytest tests/ -v --tb=short -m "not slow and not integration and not gui" --ignore=tests/test_enhanced_systems.py
 
-      - name: Run integration tests (if not on Python 3.8)
-        if: matrix.python-version != '3.8'
+      - name: Run integration tests
         run: |
           python -m pytest tests/ -v --tb=short -m "integration and not gui" || echo "Integration tests completed"
 
@@ -72,7 +59,6 @@ jobs:
           python -m pytest tests/ --cov=api --cov=ui --cov=utils --cov-report=xml --cov-report=term-missing -m "not gui" || echo "Coverage completed"
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.9'  # Only upload once
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
