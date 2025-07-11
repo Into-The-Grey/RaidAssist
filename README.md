@@ -10,63 +10,60 @@
 
 ---
 
-## ✨ Features (Alpha: v0.2.0)
+## ✨ Features (Alpha: v0.3.0)
 
-* **Dashboard Tabs** — See all your Red Border weapons, Catalyst progress, and Exotic collection at a glance. Manifest-driven and auto-cached.
-* **Search & Filter** — Quickly search your entire progress and filter by any keyword.
-* **Overlay Mode** — One-click, always-on-top overlay for live progress tracking while you play. Move and adjust transparency as you like.
-* **Global Hotkey** — Toggle the overlay (Ctrl+Alt+O by default; more customization coming).
-* **System Tray Integration** — Minimize to tray, receive pop-up desktop notifications for completion milestones.
-* **Tooltips** — Manifest-powered tooltips on every item: archetype, ammo, type, and description.
-* **API Tester** — Built-in API test tool for Bungie endpoints, including OAuth token handling and pretty-printed responses.
-* **Auto-Refresh & Settings** — Set your own refresh interval; data stays up-to-date automatically.
-* **Export** — Save your current progress (JSON/CSV) for backup, theorycrafting, or sharing.
-* **Portable by design** — All settings, logs, and caches are stored locally for easy backup and resets.
+* **Plug-and-play OAuth & Secure Auth:** One-click first-run authentication—browser auto-launch, secure Bungie login, automatic local HTTPS callback (`https://localhost:7777/callback`). No user config or secrets required. Self-signed SSL certs included for easy OAuth.
+* **Dashboard Tabs** — See all your Red Border weapons, Catalyst progress, and Exotic collection in real time. Manifest-driven and auto-cached.
+* **Search & Filter** — Instantly filter by any name, archetype, or type.
+* **Overlay Mode** — Always-on-top, draggable, resizable overlay for in-game use. Transparency and styling options included.
+* **Global Hotkey** — Toggle overlay instantly (Ctrl+Alt+O by default).
+* **System Tray Integration** — Minimize to tray, get pop-up desktop notifications for completion milestones.
+* **Tooltips** — Manifest-powered tooltips: archetype, ammo, type, description, and source.
+* **API Tester** — Run any Bungie API endpoint, with OAuth and pretty formatting.
+* **Auto-Refresh & Settings** — User-settable refresh interval, background updates, easy status view.
+* **Export** — Save your progress (JSON/CSV) for backup, analytics, or sharing.
+* **Portable by design** — All app state, logs, and cache in `/RaidAssist`—easy to backup, wipe, or reset.
 
 ---
 
 ## 🛡️ Bungie API Authentication
 
-RaidAssist uses an official, app-owned Bungie API key (like DIM and Braytech). You never need to register your own developer account or API key.
+RaidAssist uses an official, app-owned Bungie API key (like DIM and Braytech). No user registration or key management required.
 
-* On first run, you'll log in with your Bungie account via secure OAuth. A window will pop up for you to approve access to your Destiny 2 profile.
-* Only a session token is stored locally; your credentials are never kept or shared.
-* All API requests go through the official app key. **No user registration or API key copying required.**
-* **OAuth redirect:** RaidAssist uses a secure, self-hosted HTTPS callback on `https://localhost:7777/callback` to handle authentication—no external server required. Self-signed SSL certificates are included for this purpose.
+* **First-run:** Log in via browser popup; app securely handles code exchange on `https://localhost:7777/callback` (bundled self-signed SSL, safe for local use).
+* **No .env for users** — OAuth secrets are built in (EXE or injected at build). Only a session token is stored locally, never your credentials.
+* **FAQ:**
 
-**FAQ:**
-
-* *Is this safe? Will I get banned?* — Yes, it's safe. RaidAssist uses the public, documented API flows Bungie allows.
-* *Is my data private?* — Yes. Everything is local-only unless you choose to export/share it.
-* *Why do I see a browser SSL warning?* — The included `localhost.pem` cert is self-signed, so your browser may show a warning when authenticating. This is normal and safe for local use.
+  * *Is this safe?* — Yes. All authentication is handled by Bungie, using their official flow.
+  * *Will I get banned?* — No. The app uses only supported, public APIs.
+  * *Why SSL warning?* — The self-signed cert is safe for local-only OAuth redirect and never leaves your machine.
 
 #### Note on SSL Certificates
 
-This project includes `localhost.pem` and `localhost-key.pem` for local OAuth authentication with Bungie. These are self-signed and only used for development/testing. End users do **not** need to manage certificates or secrets.
+Certs (`localhost.pem` and `localhost-key.pem`) are included for development and packaging only. Users never need to manage keys or configs. OAuth is 100% automatic for all users and EXE installs.
 
 ---
 
-## 🚧 Project Status & Alpha Notice
+## 🚧 Status: v0.3.0-alpha (July 2025)
 
-**Alpha Release v0.2.0** — For early adopters, testers, and feedback. Stable core, but you may encounter bugs or edge cases.
-
-* Self-contained Python app, with EXE installer and auto-authentication (no manual .env required for users!)
-* Full roadmap and premium features (below) are on the way.
+* **First Windows EXE with zero-config OAuth onboarding**
+* **All logs, cache, and settings are portable and easy to reset**
+* **EXE packaging, UI, and performance improvements in progress**
+* **Bugs and feedback welcome!**
 
 ---
 
-## 🔥 Roadmap: Upcoming Features
+## 🔥 Roadmap: Next Features
 
 See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
 
 * Multi-account/profile support
-* Complete raid, dungeon, and activity tracking
-* Custom overlay widgets & layouts
-* Weekly milestones and vendor rotation
-* Cloud sync and mobile/web dashboard
-* Discord/social integrations
-* Loadout management, recommendations, and builds
-* Enhanced stats, milestone popups, and more
+* Raid/dungeon/activity tracking
+* Custom overlay widgets/layouts
+* Vendor and milestone reminders
+* Discord/social integration
+* Loadout/builds management
+* UI/UX and accessibility upgrades
 
 ---
 
@@ -74,9 +71,10 @@ See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
 
 1. **Requirements:**
 
-   * Python 3.8+ (required for PySide2 compatibility)
-   * Windows (required for Destiny 2 compatibility)
-   * See [requirements.txt](/requirements.txt) for dependencies (PySide2, requests, pyqthotkey)
+   * Windows (for Destiny 2 compatibility)
+   * Python 3.8+ (for dev builds only)
+   * Download the EXE from Releases or Actions for plug-and-play use
+   * [requirements.txt](/requirements.txt) lists Python dependencies
 
 2. **Install:**
 
@@ -90,26 +88,25 @@ See [ROADMAP.md](/docs/repo/ROADMAP.md) for details. Highlights include:
    python ui/interface.py
    ```
 
-   *(Follow the prompt to log in with Bungie; no extra setup required. EXE releases available as artifacts.)*
+   *(App opens browser for Bungie login—no config or .env needed! EXE is in Releases and Actions.)*
 
-> **Installer/EXE included in releases and Actions artifacts.**
+> **Latest EXE is downloadable in Releases and Actions Artifacts.**
 
 ---
 
 ## 🧑‍💻 Developer Info & Contributing
 
-* See [Developer Setup Guide](./DEVELOPER_SETUP.md) for full environment and local build steps.
-* [Collaboration Guide](./CONTRIBUTING.md) for PR/branch guidelines and community expectations.
-* [Code of Conduct](./CODE_OF_CONDUCT.md) for behavior and inclusion.
+* [Developer Setup Guide](./DEVELOPER_SETUP.md)
+* [Collaboration Guide](./CONTRIBUTING.md)
+* [Code of Conduct](./CODE_OF_CONDUCT.md)
 
-All app logic, cache, and logs are stored in `/RaidAssist/` folders—see [Developer Guide](./DEVELOPER_SETUP.md) for asset/cache structure.
+All app state, cache, logs, and settings are stored in `/RaidAssist` (see dev docs for structure).
 
 ---
 
 ## 📝 License
 
-**GPL v3.0** — See [LICENSE](LICENSE) for full terms and header requirements.
-Free, open-source, and copyleft: you can use, copy, and fork, but must preserve license and attribution.
+**GPL v3.0** — See [LICENSE](LICENSE) for full terms. Fork, build, or modify, but keep license and credit.
 
 ---
 
@@ -123,4 +120,4 @@ Free, open-source, and copyleft: you can use, copy, and fork, but must preserve 
 **Questions, bugs, or feature ideas?**
 
 * Open an [issue](https://github.com/Into-The-Grey/RaidAssist/issues)
-* PRs and suggestions welcome!
+* PRs and suggestions are always welcome!
