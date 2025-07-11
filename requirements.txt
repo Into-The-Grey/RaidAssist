@@ -1,5 +1,30 @@
+# RaidAssist Enhanced - Python Dependencies
+# Core GUI and application framework
 PySide2>=5.15.2
-pyqthotkey>=1.0.4
+
+# Enhanced features
+pyqt-hotkey>=1.0.4
+
+# API and networking
 requests>=2.25.0
+urllib3>=1.26.0
+
+# Web server for OAuth
 flask>=2.0
-python-dotenv
+
+# Configuration management
+python-dotenv>=0.19.0
+
+# Data processing and JSON handling
+orjson>=3.8.0  # Fast JSON processing
+pydantic>=1.10.0  # Data validation
+
+# Enhanced logging and monitoring
+colorlog>=6.6.0  # Colored console logs
+tqdm>=4.64.0  # Progress bars
+
+# Development and testing (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+mypy>=0.991

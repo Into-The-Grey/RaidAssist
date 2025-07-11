@@ -47,7 +47,7 @@ def get_project_root():
 
 # Load .env variables if present
 try:
-    from dotenv import load_dotenv # type: ignore
+    from dotenv import load_dotenv  # type: ignore
 
     load_dotenv()
 except ImportError:
@@ -128,3 +128,47 @@ def get_item_display(item_hash, item_defs):
     if not item:
         return f"Unknown Item ({item_hash})"
     return item.get("displayProperties", {}).get("name", f"Unnamed ({item_hash})")
+
+
+def get_item_info(item_hash, item_defs):
+    """
+    Get comprehensive item information including name, type, description, and icon.
+
+    Args:
+        item_hash (int or str): The Destiny item hash.
+        item_defs (dict): Destiny item definitions.
+
+    Returns:
+        dict: Dictionary containing item information with keys:
+            - name: Human-readable name
+            - type: Item type/category
+            - description: Item description
+            - icon: Icon path
+            - archetype: Item archetype if available
+    """
+    item = item_defs.get(str(item_hash))
+    if not item:
+        return {
+            "name": f"Unknown Item ({item_hash})",
+            "type": "Unknown",
+            "description": "Item information not available",
+            "icon": "",
+            "archetype": "",
+        }
+
+    display_props = item.get("displayProperties", {})
+
+    # Extract item type information
+    item_type = "Unknown"
+    if "itemTypeDisplayName" in item:
+        item_type = item["itemTypeDisplayName"]
+    elif "itemTypeAndTierDisplayName" in item:
+        item_type = item["itemTypeAndTierDisplayName"]
+
+    return {
+        "name": display_props.get("name", f"Unnamed ({item_hash})"),
+        "type": item_type,
+        "description": display_props.get("description", ""),
+        "icon": display_props.get("icon", ""),
+        "archetype": item.get("itemSubType", ""),
+    }

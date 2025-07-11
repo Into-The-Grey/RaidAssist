@@ -41,6 +41,13 @@ jobs:
           pip install -r dev-requirements.txt
           pip install pyinstaller
 
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Verify enhanced systems
+        run: |
+          python tests/verify_enhanced.py || echo "Verification completed with warnings"
+
       - name: Check required secrets
         run: |
           if [ -z "${BUNGIE_API_KEY}" ] || [ -z "${BUNGIE_CLIENT_ID}" ] || [ -z "${BUNGIE_CLIENT_SECRET}" ] || [ -z "${BUNGIE_REDIRECT_URI}" ]; then

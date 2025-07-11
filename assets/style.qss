@@ -1,0 +1,104 @@
+/* ===== RaidAssist Global Style (assets/style.qss) ===== */
+
+QWidget {
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    background: #181C20;
+    color: #f3f3f3;
+    font-size: 14px;
+}
+
+#sidebar {
+    background: #21262c;
+    border-right: 2px solid #222;
+}
+#sidebarTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #d1d9e6;
+    margin-bottom: 10px;
+}
+QPushButton#navButton {
+    background: #292f36;
+    color: #cfd8dc;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 600;
+}
+QPushButton#navButton:hover {
+    background: #39414d;
+    color: #fff;
+}
+QTabWidget::pane, #mainTabs {
+    background: #202328;
+    border-radius: 12px;
+}
+QGroupBox#contentCard {
+    background: #22262b;
+    border-radius: 16px;
+    border: 2px solid #353d4a;
+    padding: 14px;
+}
+QLineEdit#searchBox {
+    background: #282c34;
+    color: #ececec;
+    border: 1px solid #49505a;
+    border-radius: 7px;
+    padding: 7px 14px;
+    margin-bottom: 8px;
+}
+QListWidget#contentList {
+    background: #24272b;
+    border-radius: 8px;
+    border: 1px solid #363b44;
+}
+#heroArea {
+    background: #232943;
+    border-radius: 18px;
+    border: 2px solid #4955b5;
+    margin-bottom: 16px;
+}
+#heroTitle {
+    font-size: 28px;
+    color: #86a9fa;
+    font-weight: bold;
+}
+#heroSubtitle {
+    font-size: 15px;
+    color: #bfc3d1;
+    margin-top: 3px;
+}
+QStatusBar {
+    background: #181C20;
+    color: #a9c6ff;
+    border-top: 1px solid #2d3340;
+    padding: 2px 10px;
+}
+    border-radius: 12px;
+    padding: 8px 18px;
+    color: #6354c0;
+}
+
+/* Overlay Window */
+QSlider {
+    min-height: 10px;
+    background: #ede7ff;
+    border-radius: 8px;
+}
+QSlider::handle {
+    background: #7350fa;
+    border-radius: 8px;
+}
+
+QSystemTrayIcon, QMenu {
+    background: #f9f9fe;
+    border-radius: 14px;
+}
+
+/* App logo area (if you want to do custom widget bg): */
+#AppLogoBox {
+    background: #e7e9ff;
+    border-radius: 22px;
+    padding: 18px;
+}

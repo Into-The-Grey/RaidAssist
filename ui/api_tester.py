@@ -13,7 +13,14 @@ from PySide2.QtWidgets import (  # type: ignore
     QPushButton,
     QTextEdit,
     QFileDialog,
+    QGroupBox,
+    QFrame,
+    QSpacerItem,
+    QSizePolicy,
+    QApplication,
 )
+from PySide2.QtCore import Qt  # type: ignore
+from PySide2.QtGui import QIcon, QFont  # type: ignore
 import requests
 import json
 import os
@@ -66,6 +73,21 @@ def load_token():
     return ""
 
 
+def get_asset_path(filename):
+    """
+    Helper function to get asset file paths.
+    Returns:
+        str: Path to asset file or empty string if not found.
+    """
+    # Look for assets in the project's assets directory
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    asset_path = os.path.join(project_root, "assets", filename)
+    if os.path.exists(asset_path):
+        return asset_path
+    # Fallback to system icons or return empty string
+    return ""
+
+
 class ApiTesterDialog(QDialog):
     """
     Simple dialog to send API requests and show/save responses.
@@ -73,28 +95,134 @@ class ApiTesterDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        app = QApplication.instance()
+        if app:
+            from ui.interface import load_qss
+
+            load_qss(app)
+
         self.setWindowTitle("Bungie API Tester")
-        self.setMinimumWidth(600)
+        self.setMinimumWidth(800)
+        self.setMinimumHeight(600)
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(16)
+        self.layout.setContentsMargins(20, 20, 20, 20)
 
-        self.endpoint_input = QLineEdit()
-        self.endpoint_input.setPlaceholderText("/Destiny2/Manifest/")
-        self.send_button = QPushButton("Send Request")
-        self.save_button = QPushButton("Save Result")
-        self.result_view = QTextEdit()
-        self.result_view.setReadOnly(True)
+        # Hero area
+        self.create_hero_area()
 
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Endpoint:"))
-        row.addWidget(self.endpoint_input)
-        row.addWidget(self.send_button)
-        self.layout.addLayout(row)
-        self.layout.addWidget(self.result_view)
-        self.layout.addWidget(self.save_button)
+        # Request card
+        self.create_request_card()
+
+        # Results card
+        self.create_results_card()
+
+        # Action buttons
+        self.create_action_buttons()
+
         self.setLayout(self.layout)
 
         self.send_button.clicked.connect(self.make_request)
         self.save_button.clicked.connect(self.save_result)
+
+    def create_hero_area(self):
+        """Create the hero area with welcome message and status."""
+        hero_frame = QFrame()
+        hero_frame.setObjectName("heroFrame")
+        hero_layout = QHBoxLayout(hero_frame)
+
+        # Status icon/text
+        status_label = QLabel("🎮 Bungie API Tester")
+        status_font = QFont()
+        status_font.setPointSize(16)
+        status_font.setBold(True)
+        status_label.setFont(status_font)
+
+        # Connection status
+        token = load_token()
+        auth_status = QLabel(f"🔐 Auth: {'Connected' if token else 'API Key Only'}")
+        auth_status.setStyleSheet("color: #4caf50;" if token else "color: #ff9800;")
+
+        hero_layout.addWidget(status_label)
+        hero_layout.addStretch()
+        hero_layout.addWidget(auth_status)
+
+        self.layout.addWidget(hero_frame)
+
+    def create_request_card(self):
+        """Create the request input card."""
+        request_group = QGroupBox("API Request")
+        request_layout = QVBoxLayout()
+
+        # Endpoint input row
+        endpoint_row = QHBoxLayout()
+        endpoint_label = QLabel("Endpoint:")
+        self.endpoint_input = QLineEdit()
+        self.endpoint_input.setPlaceholderText("/Destiny2/Manifest/")
+        self.endpoint_input.setStyleSheet(
+            "padding: 8px; border-radius: 4px; border: 1px solid #ccc;"
+        )
+
+        self.send_button = QPushButton("Send Request")
+        send_icon_path = get_asset_path("send_icon.png")
+        if send_icon_path:
+            self.send_button.setIcon(QIcon(send_icon_path))
+        else:
+            self.send_button.setText("🚀 Send Request")
+
+        endpoint_row.addWidget(endpoint_label)
+        endpoint_row.addWidget(self.endpoint_input, 1)
+        endpoint_row.addWidget(self.send_button)
+
+        request_layout.addLayout(endpoint_row)
+        request_group.setLayout(request_layout)
+        self.layout.addWidget(request_group)
+
+    def create_results_card(self):
+        """Create the results display card."""
+        results_group = QGroupBox("API Response")
+        results_layout = QVBoxLayout()
+
+        self.result_view = QTextEdit()
+        self.result_view.setReadOnly(True)
+        self.result_view.setPlaceholderText(
+            "Response will appear here after sending a request..."
+        )
+        self.result_view.setStyleSheet(
+            """
+            QTextEdit {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 8px;
+                font-family: 'Courier New', monospace;
+                background-color: #fafafa;
+            }
+        """
+        )
+
+        results_layout.addWidget(self.result_view)
+        results_group.setLayout(results_layout)
+        self.layout.addWidget(results_group, 1)  # Allow to expand
+
+    def create_action_buttons(self):
+        """Create the action buttons area."""
+        actions_frame = QFrame()
+        actions_layout = QHBoxLayout(actions_frame)
+
+        # Add spacer to push buttons to the right
+        spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        actions_layout.addItem(spacer)
+
+        self.save_button = QPushButton("Save Result")
+        save_icon_path = get_asset_path("save_icon.png")
+        if save_icon_path:
+            self.save_button.setIcon(QIcon(save_icon_path))
+        else:
+            self.save_button.setText("💾 Save Result")
+
+        actions_layout.addWidget(self.save_button)
+        self.layout.addWidget(actions_frame)
 
     def make_request(self):
         """
@@ -109,6 +237,11 @@ class ApiTesterDialog(QDialog):
         if token:
             headers["Authorization"] = f"Bearer {token}"
         logging.info(f"Sending GET to {url} (auth: {'yes' if token else 'no'})")
+
+        # Update UI to show loading state
+        self.send_button.setText("🔄 Sending...")
+        self.send_button.setEnabled(False)
+
         try:
             r = requests.get(url, headers=headers)
             r.raise_for_status()
@@ -123,6 +256,15 @@ class ApiTesterDialog(QDialog):
             error_msg = f"Error: {e}"
             self.result_view.setPlainText(error_msg)
             logging.error(f"API {endpoint} error: {e}")
+        finally:
+            # Restore button state
+            send_icon_path = get_asset_path("send_icon.png")
+            if send_icon_path:
+                self.send_button.setIcon(QIcon(send_icon_path))
+                self.send_button.setText("Send Request")
+            else:
+                self.send_button.setText("🚀 Send Request")
+            self.send_button.setEnabled(True)
 
     def save_result(self):
         """

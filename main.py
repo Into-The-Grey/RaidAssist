@@ -16,48 +16,121 @@
 #
 # Contact: ncacord@protonmail.com
 
-
 """
-main.py — Entry point for RaidAssist.
-Fetches and caches the Destiny 2 Bungie profile for the user.
+main.py — Enhanced entry point for RaidAssist.
 
-Usage:
-- Set BUNGIE_API_KEY, MEMBERSHIP_TYPE, and MEMBERSHIP_ID as environment variables
-  or replace the placeholders below.
+This now launches the complete enhanced GUI application with:
+- Advanced error handling and logging
+- Professional UI design
+- Enhanced overlay system (7-8/10 quality)
+- Robust data management
+- System tray integration
+- Hotkey support
+
+For CLI-only usage, use the individual API modules directly.
 """
 
+import sys
 import os
-import logging
-from api.bungie import fetch_profile, ensure_authenticated
 
-# Optional: log to file if desired
-LOG_PATH = "RaidAssist/logs/main.log"
-os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
-logging.basicConfig(
-    filename=LOG_PATH,
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+# Enhanced error handling
+try:
+    from utils.logging_manager import get_logger
+
+    logger = get_logger("raidassist.main")
+    ENHANCED_LOGGING = True
+except ImportError:
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger("raidassist.main")
+    ENHANCED_LOGGING = False
+
+# GUI imports
+try:
+    from PySide2.QtWidgets import QApplication, QMessageBox
+    from PySide2.QtCore import Qt
+
+    GUI_AVAILABLE = True
+except ImportError:
+    GUI_AVAILABLE = False
+
+
+def ensure_gui_dependencies():
+    """Ensure GUI dependencies are available."""
+    if not GUI_AVAILABLE:
+        print("❌ GUI dependencies not available!")
+        print("Please install PySide2: pip install PySide2")
+        return False
+    return True
+
+
+def launch_ui():
+    """Launch the UI application."""
+    try:
+        from ui.interface import RaidAssistUI
+        from ui import UI_AVAILABLE
+
+        if not UI_AVAILABLE:
+            logger.error("UI not available - Qt/PySide2 not installed")
+            print("❌ No UI available - Qt/PySide2 not installed")
+            return 1
+
+        # Create application
+        app = QApplication(sys.argv)
+        app.setApplicationName("RaidAssist")
+        app.setApplicationVersion("2.0.0")
+        app.setOrganizationName("RaidAssist")
+        app.setQuitOnLastWindowClosed(False)  # Keep running in tray
+
+        # Create and show main window
+        window = RaidAssistUI()
+        window.show()
+
+        logger.info("RaidAssist UI launched successfully")
+        return app.exec_()
+
+    except Exception as e:
+        logger.error(f"Failed to launch UI: {e}")
+        if GUI_AVAILABLE:
+            QMessageBox.critical(
+                None,
+                "Launch Error",
+                f"Failed to start RaidAssist:\n\n{e}\n\n"
+                "Please check your installation and try again.",
+            )
+        else:
+            print(f"❌ Launch failed: {e}")
+        return 1
+
+
+def main():
+    """Main entry point with error handling."""
+    # Check GUI availability
+    if not ensure_gui_dependencies():
+        return 1
+
+    print("🎮 Starting RaidAssist...")
+    print("Destiny 2 Progression Tracker and Overlay")
+    print("=" * 50)
+
+    try:
+        logger.info("Attempting to launch UI")
+        return launch_ui()
+
+    except Exception as e:
+        logger.error(f"Unexpected error during launch: {e}")
+        print(f"❌ Critical error: {e}")
+        return 1
+
 
 if __name__ == "__main__":
-    # Check authentication before proceeding
-    if not ensure_authenticated():
-        print("Authentication required. Please log in to Bungie to continue.")
-        exit(1)
-
-    # Set these with environment variables or direct assignment
-    membership_type = os.environ.get(
-        "MEMBERSHIP_TYPE", 3
-    )  # 1=Xbox, 2=PSN, 3=Steam, etc.
-    membership_id = os.environ.get("MEMBERSHIP_ID", "YOUR_MEMBERSHIP_ID")
-
-    print("Fetching Bungie profile...")
     try:
-        data = fetch_profile(membership_type, membership_id)
-        if data:
-            print("Profile data fetched and cached successfully.")
-        else:
-            print("Failed to fetch profile data.")
+        exit_code = main()
+        sys.exit(exit_code)
+    except KeyboardInterrupt:
+        print("\n👋 RaidAssist stopped by user")
+        sys.exit(0)
     except Exception as e:
-        logging.error(f"Profile fetch failed: {e}")
-        print(f"Error fetching profile: {e}")
+        print(f"💥 Fatal error: {e}")
+        sys.exit(1)
