@@ -91,8 +91,8 @@ if FLASK_AVAILABLE:
             logger.error(f"Error in OAuth callback: {e}")
             return (
                 "<h3>🚫 Authentication Error</h3>"
-                + f"<p>An error occurred: {html.escape(str(e))}</p>"
-                + "<p>Please try again.</p>",
+                + "<p>An unexpected error occurred. Please try again later.</p>"
+                + "<p>If the issue persists, contact support.</p>",
                 500,
             )
 
