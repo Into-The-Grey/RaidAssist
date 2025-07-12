@@ -221,7 +221,7 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
             pass
 
         def json(self):
-            return {"profile": "ok"}
+            return {"Response": {"profile": "ok"}}
 
         @property
         def status_code(self):
@@ -241,7 +241,7 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
 
     # Should write the cache and return the dict
     out = bungie.fetch_profile(3, "12345")
-    assert out == {"profile": "ok"}
+    assert out == {"Response": {"profile": "ok"}}
     # Cache file written
     assert os.path.exists(tmp_path / "profile.json")
     # Content check

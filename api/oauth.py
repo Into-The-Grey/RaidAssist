@@ -19,7 +19,7 @@ from urllib.parse import urlparse, parse_qs
 # ==== CONFIGURATION ====
 CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "YOUR_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("BUNGIE_CLIENT_SECRET", "")
-REDIRECT_PORT = int(os.environ.get("BUNGIE_REDIRECT_PORT", "8080"))
+REDIRECT_PORT = int(os.environ.get("BUNGIE_REDIRECT_PORT", "7777"))
 REDIRECT_URI = f"http://localhost:{REDIRECT_PORT}/"
 SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
 LOG_PATH = os.path.expanduser("~/.raidassist/oauth.log")

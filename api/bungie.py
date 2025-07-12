@@ -80,7 +80,7 @@ API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
 BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "")
 BUNGIE_CLIENT_SECRET = os.environ.get("BUNGIE_CLIENT_SECRET", "")
 BUNGIE_REDIRECT_URI = os.environ.get(
-    "BUNGIE_REDIRECT_URI", "https://localhost:8080/callback"
+    "BUNGIE_REDIRECT_URI", "https://localhost:7777/callback"
 )
 
 PROFILE_CACHE_PATH = os.path.join(CACHE_DIR, "profile.json")
