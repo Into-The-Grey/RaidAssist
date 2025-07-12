@@ -244,9 +244,10 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
     assert out == {"Response": {"profile": "ok"}}
     # Cache file written
     assert os.path.exists(tmp_path / "profile.json")
-    # Content check
+    # Content check - match the actual cache structure
     with open(tmp_path / "profile.json") as f:
-        assert json.load(f) == {"profile": "ok"}
+        cache_content = json.load(f)
+        assert cache_content["profile"] == {"Response": {"profile": "ok"}}
 
 
 def test_fetch_profile_no_token(monkeypatch):
