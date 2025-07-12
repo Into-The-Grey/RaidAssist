@@ -18,6 +18,21 @@ import os
 
 from utils.logging_manager import logger_manager, log_context
 
+# Module-level Qt availability check
+try:
+    import PyQt5.QtWidgets
+    import PyQt5.QtCore
+
+    QT_AVAILABLE = True
+except ImportError:
+    try:
+        import PySide2.QtWidgets  # type: ignore
+        import PySide2.QtCore  # type: ignore
+
+        QT_AVAILABLE = True
+    except ImportError:
+        QT_AVAILABLE = False
+
 try:
     from PyQt5.QtWidgets import QWidget
 except ImportError:
@@ -77,24 +92,12 @@ class ErrorHandler:
     """
 
     def __init__(self):
-        # Detect Qt availability
-        self.QT_AVAILABLE = False
-        try:
-            # Try PyQt5 first
-            import PyQt5.QtWidgets
-            import PyQt5.QtCore
-            self.QT_AVAILABLE = True
-        except ImportError:
-            try:
-                import PySide2.QtWidgets # type: ignore
-                import PySide2.QtCore # type: ignore
-                self.QT_AVAILABLE = True
-            except ImportError:
-                self.QT_AVAILABLE = False
+        # Use module-level Qt availability
+        self.QT_AVAILABLE = QT_AVAILABLE
 
         self.error_patterns: Dict[str, ErrorInfo] = {}
         self.recovery_callbacks: Dict[ErrorCategory, List[Callable]] = {}
-        self.ui_parent: Optional[QWidget] = None # type: ignore
+        self.ui_parent: Optional[QWidget] = None  # type: ignore
         self.error_history: List[ErrorInfo] = []
 
         # Load known error patterns
@@ -277,7 +280,8 @@ class ErrorHandler:
             severity=severity,
             message=display_message,
             technical_details=technical_details,
-            user_message=user_message or self._generate_user_message(display_message, category),
+            user_message=user_message
+            or self._generate_user_message(display_message, category),
             suggestions=suggestions or self._generate_suggestions(category),
             timestamp=datetime.now(),
             context=context or [],
@@ -423,7 +427,7 @@ class ErrorHandler:
             try:
                 from PyQt5.QtWidgets import QMessageBox
             except ImportError:
-                from PySide2.QtWidgets import QMessageBox # type: ignore
+                from PySide2.QtWidgets import QMessageBox  # type: ignore
         except ImportError:
             # Qt not available, fallback to console
             print(f"Error: {error_info.user_message}")
@@ -618,6 +622,7 @@ class ErrorHandler:
 # Global error handler singleton (lazy initialization)
 _error_handler_instance: Optional[ErrorHandler] = None
 
+
 def get_error_handler() -> ErrorHandler:
     global _error_handler_instance
     if _error_handler_instance is None:
@@ -632,7 +637,9 @@ def handle_error(
     severity: Optional[ErrorSeverity] = None,
 ) -> ErrorInfo:
     """Convenience function to handle exceptions."""
-    return get_error_handler().handle_exception(exception, context, user_message, severity)
+    return get_error_handler().handle_exception(
+        exception, context, user_message, severity
+    )
 
 
 def safe_execute(

@@ -223,7 +223,21 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
         def json(self):
             return {"profile": "ok"}
 
-    monkeypatch.setattr("requests.get", lambda *a, **kw: FakeResp())
+        @property
+        def status_code(self):
+            return 200
+
+    # Mock requests.get more thoroughly
+    def mock_requests_get(*args, **kwargs):
+        return FakeResp()
+
+    # Patch requests module properly
+    monkeypatch.setattr("api.bungie.requests.get", mock_requests_get)
+
+    # Ensure the function doesn't try to use cached data
+    cache_path = tmp_path / "profile.json"
+    if cache_path.exists():
+        cache_path.unlink()
 
     # Should write the cache and return the dict
     out = bungie.fetch_profile(3, "12345")
