@@ -45,8 +45,6 @@ if QT_AVAILABLE:
         pass
 
         STANDARD_UI_AVAILABLE = True
-    except ImportError:
-        pass
 
 # Export available components
 __all__ = [
