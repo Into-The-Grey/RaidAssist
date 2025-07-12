@@ -9,81 +9,22 @@ Provides centralized error handling, user-friendly error messages, and automatic
 
 import sys
 import traceback
-from typing import Optional, Dict, Any, Callable, List
+from typing import Optional, Dict, Any, Callable, List, TYPE_CHECKING
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 import json
 import os
 
-try:
-    from PySide2.QtWidgets import QMessageBox, QWidget
-    from PySide2.QtCore import QTimer
-
-    QT_AVAILABLE = True
-except ImportError:
-    QT_AVAILABLE = False
-
-    # Dummy classes for type hints when Qt not available
-    class QWidget:
-        pass
-
-    class QMessageBox:
-        # Icon constants
-        critical = 3
-        warning = 2
-        information = 1
-        # Keep compatibility with Qt naming
-        Critical = critical
-        Warning = warning
-        Information = information
-        
-        def __init__(self, parent=None):
-            pass
-            
-        def set_icon(self, icon):
-            pass
-            
-        def setIcon(self, icon):
-            """Compatibility method for Qt naming convention"""
-            return self.set_icon(icon)
-            
-        def set_window_title(self, title):
-            pass
-            
-        def setWindowTitle(self, title):
-            """Compatibility method for Qt naming convention"""
-            return self.set_window_title(title)
-            
-        def set_text(self, text):
-            pass
-            
-        def setText(self, text):
-            """Compatibility method for Qt naming convention"""
-            return self.set_text(text)
-            
-        def set_detailed_text(self, text):
-            pass
-            
-        def setDetailedText(self, text):
-            """Compatibility method for Qt naming convention"""
-            return self.set_detailed_text(text)
-            
-        def set_informative_text(self, text):
-            pass
-            
-        def setInformativeText(self, text):
-            """Compatibility method for Qt naming convention"""
-            return self.set_informative_text(text)
-            
-        def exec_(self):
-            pass
-
-    class QTimer:
-        pass
-
-
 from utils.logging_manager import logger_manager, log_context
+
+try:
+    from PyQt5.QtWidgets import QWidget
+except ImportError:
+    try:
+        from PySide2.QtWidgets import QWidget  # type: ignore
+    except ImportError:
+        QWidget = None
 
 
 class ErrorSeverity(Enum):
@@ -110,7 +51,7 @@ class ErrorCategory(Enum):
 class ErrorInfo:
     """Complete error information for proper handling and display."""
 
-    id: str
+    id: str  # Error ID in format <CATEGORY><3-digit number>, e.g., NET001
     category: ErrorCategory
     severity: ErrorSeverity
     message: str
@@ -136,10 +77,25 @@ class ErrorHandler:
     """
 
     def __init__(self):
-        self.error_history: List[ErrorInfo] = []
+        # Detect Qt availability
+        self.QT_AVAILABLE = False
+        try:
+            # Try PyQt5 first
+            import PyQt5.QtWidgets
+            import PyQt5.QtCore
+            self.QT_AVAILABLE = True
+        except ImportError:
+            try:
+                import PySide2.QtWidgets # type: ignore
+                import PySide2.QtCore # type: ignore
+                self.QT_AVAILABLE = True
+            except ImportError:
+                self.QT_AVAILABLE = False
+
         self.error_patterns: Dict[str, ErrorInfo] = {}
         self.recovery_callbacks: Dict[ErrorCategory, List[Callable]] = {}
-        self.ui_parent: Optional[QWidget] = None
+        self.ui_parent: Optional[QWidget] = None # type: ignore
+        self.error_history: List[ErrorInfo] = []
 
         # Load known error patterns
         self._load_error_patterns()
@@ -147,7 +103,7 @@ class ErrorHandler:
         # Setup system exception handler
         self._setup_exception_handler()
 
-    def set_ui_parent(self, parent: QWidget):
+    def set_ui_parent(self, parent):
         """Set the parent widget for error dialogs."""
         self.ui_parent = parent
 
@@ -289,7 +245,11 @@ class ErrorHandler:
     ) -> ErrorInfo:
         """Create a complete ErrorInfo object from exception or message."""
 
-        error_id = f"{category.value.upper()[:3]}{len(self.error_history) + 1:03d}"
+        # Use a monotonic counter per category for unique error IDs
+        if not hasattr(self, "_error_id_counters"):
+            self._error_id_counters = {cat: 0 for cat in ErrorCategory}
+        self._error_id_counters[category] += 1
+        error_id = f"{category.name.upper()}{self._error_id_counters[category]:03d}"
 
         if exception:
             exc_type = type(exception).__name__
@@ -310,14 +270,14 @@ class ErrorHandler:
             display_message = message or "Unknown error occurred"
             technical_details = message or "No technical details available"
 
+        # Always set timestamp to now when creating the error instance
         return ErrorInfo(
             id=error_id,
             category=category,
             severity=severity,
             message=display_message,
             technical_details=technical_details,
-            user_message=user_message
-            or self._generate_user_message(display_message, category),
+            user_message=user_message or self._generate_user_message(display_message, category),
             suggestions=suggestions or self._generate_suggestions(category),
             timestamp=datetime.now(),
             context=context or [],
@@ -447,24 +407,26 @@ class ErrorHandler:
         ]:
             self._show_user_notification(error_info)
 
-        # Attempt recovery if possible
-        if error_info.recoverable and error_info.recovery_action:
-            try:
-                error_info.recovery_action()
-            except Exception as e:
-                logger_manager.error(
-                    f"Recovery action failed for {error_info.id}", exception=e
-                )
-
     def _show_user_notification(self, error_info: ErrorInfo):
         """Show appropriate user notification for the error."""
-        if not QT_AVAILABLE or not self.ui_parent:
+        if not self.QT_AVAILABLE:
             # Fallback to console output
-            print(f"Error: {error_info.user_message}")
+            print(f"• {error_info.user_message}")
             if error_info.suggestions:
                 print("Suggestions:")
                 for suggestion in error_info.suggestions:
-                    print(f"  - {suggestion}")
+                    print(f"  • {suggestion}")
+            return
+
+        # Import Qt classes dynamically when needed
+        try:
+            try:
+                from PyQt5.QtWidgets import QMessageBox
+            except ImportError:
+                from PySide2.QtWidgets import QMessageBox # type: ignore
+        except ImportError:
+            # Qt not available, fallback to console
+            print(f"Error: {error_info.user_message}")
             return
 
         # Determine dialog type based on severity
@@ -487,7 +449,7 @@ class ErrorHandler:
             )
 
         # Show message box
-        msg_box = QMessageBox(self.ui_parent)
+        msg_box = QMessageBox(self.ui_parent if self.ui_parent else None)
         msg_box.setIcon(icon)
         msg_box.setWindowTitle(title)
         msg_box.setText(error_info.user_message)
@@ -653,18 +615,24 @@ class ErrorHandler:
         }
 
 
-# Global error handler instance
-error_handler = ErrorHandler()
+# Global error handler singleton (lazy initialization)
+_error_handler_instance: Optional[ErrorHandler] = None
+
+def get_error_handler() -> ErrorHandler:
+    global _error_handler_instance
+    if _error_handler_instance is None:
+        _error_handler_instance = ErrorHandler()
+    return _error_handler_instance
 
 
-def handle_exception(
+def handle_error(
     exception: Exception,
     context: Optional[List[str]] = None,
     user_message: Optional[str] = None,
     severity: Optional[ErrorSeverity] = None,
 ) -> ErrorInfo:
     """Convenience function to handle exceptions."""
-    return error_handler.handle_exception(exception, context, user_message, severity)
+    return get_error_handler().handle_exception(exception, context, user_message, severity)
 
 
 def safe_execute(
@@ -688,11 +656,16 @@ def safe_execute(
 
     Returns:
         Function result or default_return if function fails
+
+    Note:
+        If an exception occurs, only the user_message is shown to the user,
+        but technical details (including the exception object and traceback)
+        are captured and logged by the error handler for debugging and diagnostics.
     """
     try:
         return func(*args, **kwargs)
     except Exception as e:
-        error_handler.handle_exception(
+        get_error_handler().handle_exception(
             e, context=context or [func.__name__], user_message=user_message
         )
         return default_return
