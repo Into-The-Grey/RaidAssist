@@ -48,8 +48,8 @@ except ImportError:
 
 # GUI imports
 try:
-    from PySide2.QtWidgets import QApplication, QMessageBox
-    from PySide2.QtCore import Qt
+    from PySide2.QtWidgets import QApplication, QMessageBox # type: ignore
+    from PySide2.QtCore import Qt # type: ignore
 
     GUI_AVAILABLE = True
 except ImportError:

@@ -25,7 +25,7 @@ import time
 # Qt imports with proper error handling
 QT_AVAILABLE = False
 try:
-    from PySide2.QtWidgets import (
+    from PySide2.QtWidgets import ( # type: ignore
         QWidget,
         QVBoxLayout,
         QHBoxLayout,
@@ -51,7 +51,7 @@ try:
         QSizePolicy,
         QStackedWidget,
     )
-    from PySide2.QtCore import (
+    from PySide2.QtCore import ( # type: ignore
         Qt,
         QTimer,
         QPropertyAnimation,
@@ -65,7 +65,7 @@ try:
         QObject,
         Slot,
     )
-    from PySide2.QtGui import (
+    from PySide2.QtGui import ( # type: ignore
         QPainter,
         QColor,
         QFont,
@@ -371,7 +371,7 @@ if QT_AVAILABLE:
             progress_bar._animation = animation
             animation.start()
 
-    class AdvancedOverlay(QWidget):
+    class AdvancedOverlay(QWidget): # type: ignore
         """Main advanced overlay window with multiple widgets."""
 
         # Signals for communication

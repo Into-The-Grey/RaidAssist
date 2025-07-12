@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write   # Required for CodeQL
-      packages: read           # To fetch internal/private packs if needed
-      actions: read
-      contents: read
+      packages: write           # To fetch internal/private packs if needed
+      actions: write
+      contents: write
 
     strategy:
       fail-fast: false

@@ -231,8 +231,8 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
     def mock_requests_get(*args, **kwargs):
         return FakeResp()
 
-    # Patch requests module properly
-    monkeypatch.setattr("api.bungie.requests.get", mock_requests_get)
+    # Patch requests.get correctly
+    monkeypatch.setattr(bungie.requests, "get", mock_requests_get)
 
     # Ensure the function doesn't try to use cached data
     cache_path = tmp_path / "profile.json"

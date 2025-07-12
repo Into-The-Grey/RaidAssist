@@ -18,17 +18,16 @@ import sys
 import csv
 import json
 import time
+import logging
 from typing import Dict, List, Any, Optional
 
 # Enhanced error handling and logging
 try:
-    from utils.logging_manager import get_logger, log_context
-    from utils.error_handler import safe_execute, handle_exception, error_handler
+    from utils.logging_manager import get_logger, log_context  # type: ignore
+    from utils.error_handler import safe_execute, handle_exception, error_handler  # type: ignore
 
     ENHANCED_ERROR_HANDLING = True
 except ImportError:
-    import logging
-
     ENHANCED_ERROR_HANDLING = False
 
     def get_logger(name):
@@ -47,12 +46,12 @@ except ImportError:
     def safe_execute(func, *args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except:
+        except Exception:
             return kwargs.get("default_return")
 
 
 # Qt imports
-from PySide2.QtWidgets import (
+from PySide2.QtWidgets import (  # type: ignore
     QApplication,
     QWidget,
     QVBoxLayout,
@@ -83,7 +82,7 @@ from PySide2.QtWidgets import (
     QTreeWidget,
     QTreeWidgetItem,
 )
-from PySide2.QtCore import (
+from PySide2.QtCore import (  # type: ignore
     Qt,
     QTimer,
     QThread,
@@ -91,7 +90,7 @@ from PySide2.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
 )
-from PySide2.QtGui import QIcon, QPixmap, QFont, QColor, QPalette
+from PySide2.QtGui import QIcon, QPixmap, QFont, QColor, QPalette  # type: ignore
 
 # Import application modules
 from api.bungie import (
@@ -121,7 +120,7 @@ except ImportError:
 
 # Hotkey support
 try:
-    from pyqt_hotkey import HotKeyManager
+    import keybind  # type: ignore
 
     HOTKEY_AVAILABLE = True
 except ImportError:
@@ -948,6 +947,10 @@ class EnhancedRaidAssistUI(QWidget):
             self.export_csv_btn.clicked.connect(lambda: self._export_data("csv"))
             self.api_tester_btn.clicked.connect(self._open_api_tester)
 
+            # Additional tools connections
+            self.overlay_advanced_btn.clicked.connect(self._show_advanced_overlay)
+            self.settings_advanced_btn.clicked.connect(self.open_settings)
+
     def _setup_background_services(self):
         """Setup background services and timers."""
         # Auto-refresh timer
@@ -972,11 +975,9 @@ class EnhancedRaidAssistUI(QWidget):
             return
 
         try:
-            self.hotkey_manager = HotKeyManager(self)
-            self.hotkey_manager.registerHotKey("ctrl+alt+r", self.refresh_data)
-            self.hotkey_manager.registerHotKey(
-                "ctrl+alt+o", self._toggle_advanced_overlay
-            )
+            # Register hotkeys using keybind
+            keybind.register("ctrl+alt+r", self.refresh_data)
+            keybind.register("ctrl+alt+o", self._toggle_advanced_overlay)
             self.logger.info("Global hotkeys registered successfully")
         except Exception as e:
             self.logger.warning(f"Failed to setup hotkeys: {e}")
@@ -1339,9 +1340,15 @@ class EnhancedRaidAssistUI(QWidget):
             return
 
         try:
-            if self.advanced_overlay_ref and self.advanced_overlay_ref.isVisible():
-                self.advanced_overlay_ref.raise_()
-                self.advanced_overlay_ref.activateWindow()
+            if (
+                self.advanced_overlay_ref
+                and hasattr(self.advanced_overlay_ref, "isVisible")
+                and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+            ):
+                if hasattr(self.advanced_overlay_ref, "raise_"):
+                    getattr(self.advanced_overlay_ref, "raise_", lambda: None)()
+                if hasattr(self.advanced_overlay_ref, "activateWindow"):
+                    getattr(self.advanced_overlay_ref, "activateWindow", lambda: None)()
                 return
 
             # Prepare data for overlay
@@ -1351,9 +1358,14 @@ class EnhancedRaidAssistUI(QWidget):
                 "exotics": [item["raw"] for item in self._exotic_items],
             }
 
-            self.advanced_overlay_ref = create_advanced_overlay(overlay_data)
+            self.advanced_overlay_ref = create_advanced_overlay(None)
             if self.advanced_overlay_ref:
-                self.advanced_overlay_ref.show()
+                if hasattr(self.advanced_overlay_ref, "update_data"):
+                    getattr(self.advanced_overlay_ref, "update_data", lambda x: None)(
+                        overlay_data
+                    )
+                if hasattr(self.advanced_overlay_ref, "show"):
+                    getattr(self.advanced_overlay_ref, "show", lambda: None)()
                 self.logger.info("Advanced overlay opened successfully")
             else:
                 raise RuntimeError("Failed to create overlay instance")
@@ -1366,20 +1378,32 @@ class EnhancedRaidAssistUI(QWidget):
 
     def _toggle_advanced_overlay(self):
         """Toggle advanced overlay visibility."""
-        if self.advanced_overlay_ref and self.advanced_overlay_ref.isVisible():
-            self.advanced_overlay_ref.close()
+        if (
+            self.advanced_overlay_ref
+            and hasattr(self.advanced_overlay_ref, "isVisible")
+            and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+        ):
+            if hasattr(self.advanced_overlay_ref, "close"):
+                getattr(self.advanced_overlay_ref, "close", lambda: None)()
         else:
             self._show_advanced_overlay()
 
     def _update_overlay_data(self):
         """Update overlay with current data."""
-        if self.advanced_overlay_ref and self.advanced_overlay_ref.isVisible():
+        if (
+            self.advanced_overlay_ref
+            and hasattr(self.advanced_overlay_ref, "isVisible")
+            and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+        ):
             overlay_data = {
                 "red_borders": [item["raw"] for item in self._rb_items],
                 "catalysts": [item["raw"] for item in self._cat_items],
                 "exotics": [item["raw"] for item in self._exotic_items],
             }
-            self.advanced_overlay_ref.update_data(overlay_data)
+            if hasattr(self.advanced_overlay_ref, "update_data"):
+                getattr(self.advanced_overlay_ref, "update_data", lambda x: None)(
+                    overlay_data
+                )
 
     # Utility Methods
     def _check_connection(self):
@@ -1501,8 +1525,15 @@ class EnhancedRaidAssistUI(QWidget):
 
     def closeEvent(self, event):
         """Handle window close event."""
+        # Cleanup hotkeys before closing
+        if HOTKEY_AVAILABLE:
+            try:
+                keybind.clear()
+            except:
+                pass
+
         # Minimize to tray instead of closing
-        if self.tray_icon.isVisible():
+        if hasattr(self, "tray_icon") and self.tray_icon.isVisible():
             self.hide()
             event.ignore()
         else:

@@ -9,7 +9,7 @@ on:
 permissions:
   issues: write        # Needed to comment on issues
   models: read         # For AI inference (actions/ai-inference)
-  contents: read       # For repo access
+  contents: write       # For repo access
 
 jobs:
   summary:

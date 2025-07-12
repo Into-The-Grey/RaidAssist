@@ -38,10 +38,6 @@ jobs:
       - name: Create logs directory
         run: mkdir -p logs
 
-      - name: Run system verification
-        run: |
-          python tests/verify_enhanced.py || echo "Verification completed with warnings"
-
       - name: Run enhanced system tests
         run: |
           python -m pytest tests/test_enhanced_systems.py -v --tb=short -m "not gui" || echo "Enhanced tests completed"

@@ -100,7 +100,7 @@ else:
     # Fallback implementations when Flask is not available
     received_code = {}
 
-    class nullcontext:
+    class nullcontext: # type: ignore
         """Fallback context manager when enhanced logging not available."""
 
         def __enter__(self):
@@ -117,7 +117,7 @@ else:
             logger.warning("SSL context provided but Flask not available")
         received_code["error"] = "Flask not installed"
 
-    def get_auth_code(auth_url, ssl_context=None, timeout=180):
+    def get_auth_code(auth_url, ssl_context=None, timeout=180): # type: ignore
         """Fallback auth code getter - not functional without Flask."""
         logger.error(f"Cannot get auth code for {auth_url} - Flask not available")
         if ssl_context:  # Use parameter to avoid lint warning
