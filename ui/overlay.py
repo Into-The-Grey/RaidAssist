@@ -88,7 +88,11 @@ except ImportError:
 
 # Always import these for type definitions
 from utils.logging_manager import get_logger, log_context
-from utils.error_handler import safe_execute, handle_exception
+# utils.error_handler provides ``safe_execute`` and ``handle_error`` for
+# generalised exception handling. ``handle_exception`` was never a public
+# helper, so attempting to import it causes an ImportError when this module
+# is loaded.  Import the correct helper instead.
+from utils.error_handler import safe_execute, handle_error
 
 
 class OverlayDisplayMode(Enum):
