@@ -14,16 +14,25 @@ __author__ = "Nicholas Acord"
 
 # Enhanced utility imports
 try:
-    from .logging_manager import (RaidAssistLogger, get_logger, log_context,
-                                  logger_manager)
+    from .logging_manager import (
+        RaidAssistLogger,
+        get_logger,
+        log_context,
+        logger_manager,
+    )
 
     LOGGING_AVAILABLE = True
 except ImportError:
     LOGGING_AVAILABLE = False
 
 try:
-    from .error_handler import (ErrorHandler, ErrorSeverity, error_handler,
-                                handle_exception, safe_execute)
+    from .error_handler import (
+        ErrorHandler,
+        ErrorSeverity,
+        get_error_handler,
+        handle_error,
+        safe_execute,
+    )
 
     ERROR_HANDLING_AVAILABLE = True
 except ImportError:
@@ -39,8 +48,8 @@ if ERROR_HANDLING_AVAILABLE:
     __all__.extend(
         [
             "safe_execute",
-            "handle_exception",
-            "error_handler",
+            "handle_error",
+            "get_error_handler",
             "ErrorHandler",
             "ErrorSeverity",
         ]

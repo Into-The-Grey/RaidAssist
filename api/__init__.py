@@ -16,30 +16,37 @@ __version__ = "2.0.0"
 __author__ = "Nicholas Acord"
 
 # Core API components
-from .bungie import (ensure_authenticated, fetch_profile, load_cached_profile,
-                     test_api_connection)
-from .manifest import \
-    get_item_info  # This function exists, get_item_name doesn't
+from .bungie import (
+    ensure_authenticated,
+    fetch_profile,
+    load_cached_profile,
+    test_api_connection,
+)
+from .manifest import get_item_info  # This function exists, get_item_name doesn't
 from .manifest import load_item_definitions
 
-# OAuth functionality (may not be a class)
+# OAuth functionality (functions, not a class)
 try:
-    from .oauth import OAuth
+    from .oauth import authorize, get_access_token
 
-    OAUTH_CLASS_AVAILABLE = True
+    OAUTH_FUNCTIONS_AVAILABLE = True
 except ImportError:
-    OAUTH_CLASS_AVAILABLE = False
+    OAUTH_FUNCTIONS_AVAILABLE = False
 
-from .parse_profile import (extract_catalysts, extract_exotics,
-                            extract_red_borders, load_profile)
+from .parse_profile import (
+    extract_catalysts,
+    extract_exotics,
+    extract_red_borders,
+    load_profile,
+)
 
-# Exotics module (may not have collect_exotics function)
+# Exotics module (available functions)
 try:
-    from .exotics import collect_exotics
+    from .exotics import is_exotic, all_exotics, build_exotic_cache, load_exotic_cache
 
-    COLLECT_EXOTICS_AVAILABLE = True
+    EXOTICS_FUNCTIONS_AVAILABLE = True
 except ImportError:
-    COLLECT_EXOTICS_AVAILABLE = False
+    EXOTICS_FUNCTIONS_AVAILABLE = False
 
 __all__ = [
     # Authentication
@@ -60,11 +67,13 @@ __all__ = [
 ]
 
 # Add optional components if available
-if OAUTH_CLASS_AVAILABLE:
-    __all__.append("OAuth")
+if OAUTH_FUNCTIONS_AVAILABLE:
+    __all__.extend(["authorize", "get_access_token"])
 
-if COLLECT_EXOTICS_AVAILABLE:
-    __all__.append("collect_exotics")
+if EXOTICS_FUNCTIONS_AVAILABLE:
+    __all__.extend(
+        ["is_exotic", "all_exotics", "build_exotic_cache", "load_exotic_cache"]
+    )
 
 
 # API health check
