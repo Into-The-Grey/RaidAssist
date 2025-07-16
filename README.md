@@ -28,19 +28,32 @@
 
 ## 🛡️ Bungie API Authentication
 
-RaidAssist uses an official, app-owned Bungie API key (like DIM and Braytech). No user registration or key management required.
+RaidAssist uses OAuth 2.0 PKCE (Proof Key for Code Exchange) for secure authentication with the Bungie API.
 
-* **First-run:** Log in via browser popup; app securely handles code exchange on `https://localhost:7777/callback` (bundled self-signed SSL, safe for local use).
-* **No .env for users** — OAuth secrets are built in (EXE or injected at build). Only a session token is stored locally, never your credentials.
-* **FAQ:**
+### 🚀 For End Users
 
-  * *Is this safe?* — Yes. All authentication is handled by Bungie, using their official flow.
-  * *Will I get banned?* — No. The app uses only supported, public APIs.
-  * *Why SSL warning?* — The self-signed cert is safe for local-only OAuth redirect and never leaves your machine.
+* **Download the latest release** - OAuth credentials are pre-configured
+* **First run:** App opens your browser for Bungie login
+* **Automatic:** Secure token exchange happens automatically
+* **Safe:** No API keys or secrets to manage
 
-#### Note on SSL Certificates
+### 🔧 For Developers
 
-Certs (`localhost.pem` and `localhost-key.pem`) are included for development and packaging only. Users never need to manage keys or configs. OAuth is 100% automatic for all users and EXE installs.
+OAuth setup is required for development:
+
+1. **Get Bungie API credentials** at [bungie.net/Application](https://www.bungie.net/en/Application)
+2. **Copy environment template:** `cp .env.example .env`
+3. **Fill in your credentials** in the `.env` file
+4. **Verify setup:** `python verify_oauth_setup.py`
+
+See [docs/OAUTH_SETUP.md](docs/OAUTH_SETUP.md) for detailed setup instructions.
+
+#### Security Notes
+
+* OAuth flow uses PKCE - no client secrets required
+* Local HTTPS server with self-signed certificates for callback
+* Only session tokens stored locally, never your credentials
+* All authentication handled by Bungie's official OAuth system
 
 ---
 

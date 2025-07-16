@@ -41,22 +41,22 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-# ---- Environment variable loading ----
-if load_dotenv is not None:
+# ---- Environment variable loading for development only ----
+if load_dotenv is not None and os.environ.get("RAIDASSIST_DEV_MODE"):
     env_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"
     )
     if os.path.exists(env_path):
         load_dotenv(env_path)
     else:
-        logging.warning(
-            ".env file not found in project root; falling back to environment variables."
+        logging.info(
+            ".env file not found in project root; using bundled configuration."
         )
 
 SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
-API_KEY = os.environ.get(
-    "BUNGIE_API_KEY", "YOUR_BUNGIE_API_KEY"
-)  # Should always be set via .env
+
+# Bungie API configuration
+BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
 
 
 def load_token():
@@ -234,7 +234,7 @@ class ApiTesterDialog(QDialog):
         if not endpoint.startswith("/"):
             endpoint = "/" + endpoint
         url = "https://www.bungie.net/Platform" + endpoint
-        headers = {"X-API-Key": API_KEY}
+        headers = {"X-API-Key": BUNGIE_API_KEY}
         token = load_token()
         if token:
             headers["Authorization"] = f"Bearer {token}"

@@ -1,0 +1,206 @@
+"""
+Test script for OAuth PKCE implementation.
+
+Tests the new OAuth PKCE flow without requiring real authentication.
+Verifies bundled configuration and function signatures.
+"""
+
+import os
+import sys
+import tempfile
+import json
+import time
+
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def test_bundled_configuration():
+    """Test that OAuth configuration can be properly set up."""
+    print("Testing OAuth configuration setup...")
+
+    # Set test environment variables
+    import os
+
+    os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
+    os.environ["BUNGIE_CLIENT_ID"] = "12345"
+    os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+
+    # Re-import to pick up new environment variables
+    import importlib
+    import api.oauth
+
+    importlib.reload(api.oauth)
+
+    from api.oauth import BUNGIE_API_KEY, BUNGIE_CLIENT_ID, BUNGIE_REDIRECT_URI
+
+    assert BUNGIE_API_KEY == "test_api_key_12345", "API key not loaded from environment"
+    assert BUNGIE_CLIENT_ID == "12345", "Client ID not loaded from environment"
+    assert (
+        BUNGIE_REDIRECT_URI == "http://localhost:7777/callback"
+    ), "Redirect URI mismatch"
+
+    print("✅ OAuth configuration setup working correctly")
+
+
+def test_pkce_utilities():
+    """Test PKCE code generation utilities."""
+    print("Testing PKCE utilities...")
+
+    from api.oauth import generate_code_verifier, generate_code_challenge
+
+    # Test code verifier generation
+    verifier = generate_code_verifier()
+    assert len(verifier) >= 43, "Code verifier too short"
+    assert len(verifier) <= 128, "Code verifier too long"
+    assert (
+        verifier.replace("-", "").replace("_", "").isalnum()
+    ), "Invalid characters in verifier"
+
+    # Test code challenge generation
+    challenge = generate_code_challenge(verifier)
+    assert len(challenge) == 43, "Code challenge wrong length"
+    assert (
+        challenge.replace("-", "").replace("_", "").isalnum()
+    ), "Invalid characters in challenge"
+
+    print("✅ PKCE utilities working correctly")
+
+
+def test_session_management():
+    """Test session save/load functionality."""
+    print("Testing session management...")
+
+    from api.oauth import save_session, load_session, is_token_expired
+
+    # Create temporary session file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        temp_session_path = f.name
+
+    # Mock the session path
+    import api.oauth
+
+    original_path = api.oauth.SESSION_PATH
+    api.oauth.SESSION_PATH = temp_session_path
+
+    try:
+        # Test session save/load
+        test_session = {
+            "access_token": "test_token_123",
+            "refresh_token": "refresh_123",
+            "expires_at": time.time() + 3600,
+        }
+
+        save_session(test_session)
+        loaded_session = load_session()
+
+        assert loaded_session is not None, "Failed to load session"
+        assert loaded_session["access_token"] == "test_token_123", "Token mismatch"
+        assert not is_token_expired(loaded_session), "Token should not be expired"
+
+        # Test expired token
+        expired_session = {
+            "access_token": "expired_token",
+            "expires_at": time.time() - 100,
+        }
+        save_session(expired_session)
+        loaded_expired = load_session()
+        assert is_token_expired(loaded_expired), "Token should be expired"
+
+        print("✅ Session management working correctly")
+
+    finally:
+        # Restore original path and cleanup
+        api.oauth.SESSION_PATH = original_path
+        if os.path.exists(temp_session_path):
+            os.unlink(temp_session_path)
+
+
+def test_bungie_integration():
+    """Test Bungie API integration functions."""
+    print("Testing Bungie API integration...")
+
+    from api.bungie import (
+        BUNGIE_API_KEY,
+        BUNGIE_CLIENT_ID,
+        ensure_authenticated,
+        logout_user,
+    )
+
+    # Test environment configuration (should use same test values set earlier)
+    assert BUNGIE_API_KEY == "test_api_key_12345", "Bungie API key not from environment"
+    assert BUNGIE_CLIENT_ID == "12345", "Bungie Client ID not from environment"
+
+    # Test function availability (shouldn't raise errors)
+    assert callable(ensure_authenticated), "ensure_authenticated not callable"
+    assert callable(logout_user), "logout_user not callable"
+
+    print("✅ Bungie API integration configured correctly")
+
+
+def test_placeholder_handling():
+    """Test that the system properly handles missing environment variables."""
+    print("Testing placeholder handling for missing environment variables...")
+
+    # Temporarily clear OAuth-related env vars
+    env_backup = {}
+    oauth_vars = [
+        "BUNGIE_API_KEY",
+        "BUNGIE_CLIENT_ID",
+        "BUNGIE_REDIRECT_URI",
+    ]
+
+    for var in oauth_vars:
+        if var in os.environ:
+            env_backup[var] = os.environ[var]
+            del os.environ[var]
+
+    try:
+        # Re-import to test without env vars
+        import importlib
+        import api.oauth
+        import api.bungie
+
+        importlib.reload(api.oauth)
+        importlib.reload(api.bungie)
+
+        # Should use placeholder values when env vars not set
+        assert api.oauth.BUNGIE_API_KEY == "your_bungie_api_key_here"
+        assert api.oauth.BUNGIE_CLIENT_ID == "your_client_id_here"
+
+        print("✅ Placeholder handling works correctly")
+
+    finally:
+        # Restore environment variables
+        for var, value in env_backup.items():
+            os.environ[var] = value
+
+
+def run_all_tests():
+    """Run all OAuth PKCE tests."""
+    print("Running OAuth PKCE Implementation Tests")
+    print("=" * 50)
+
+    try:
+        test_bundled_configuration()
+        test_pkce_utilities()
+        test_session_management()
+        test_bungie_integration()
+        test_placeholder_handling()
+
+        print("\n" + "=" * 50)
+        print("🎉 All OAuth PKCE tests passed!")
+        print("The new authentication system is ready to use.")
+        return True
+
+    except Exception as e:
+        print(f"\n❌ Test failed: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return False
+
+
+if __name__ == "__main__":
+    success = run_all_tests()
+    sys.exit(0 if success else 1)

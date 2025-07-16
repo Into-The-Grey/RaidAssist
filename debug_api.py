@@ -13,16 +13,17 @@ import requests
 import json
 from typing import Dict, Any, Optional
 
-# Load environment variables
+# Load environment variables for development/testing only
 try:
     from dotenv import load_dotenv
 
-    load_dotenv()
+    if os.environ.get("RAIDASSIST_DEV_MODE"):
+        load_dotenv()
 except ImportError:
-    pass
+    pass  # Continue without dotenv - use bundled configuration
 
-# Get API key (same logic as in bungie.py)
-API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
+# Get API key from environment
+BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
 USER_AGENT = "RaidAssist/1.0"
 
 
@@ -66,19 +67,17 @@ def main():
     print("=" * 60)
 
     # Check API key configuration
-    print(
-        f"\nAPI Key configured: {'✅ YES' if API_KEY != 'YOUR_BUNGIE_API_KEY' else '❌ NO (using placeholder)'}"
-    )
-    print(f"API Key length: {len(API_KEY)} characters")
-
-    if API_KEY == "YOUR_BUNGIE_API_KEY":
-        print(
-            "\n⚠️  WARNING: Using placeholder API key. Set BUNGIE_API_KEY environment variable!"
-        )
-        print("Without a valid API key, all requests will fail.")
+    if BUNGIE_API_KEY == "your_bungie_api_key_here":
+        print(f"\n❌ API Key not configured!")
+        print("Please set the BUNGIE_API_KEY environment variable.")
+        print("See OAUTH_SETUP.md for instructions.")
+        return
+    else:
+        print(f"\n✅ API Key configured")
+        print(f"API Key length: {len(BUNGIE_API_KEY)} characters")
 
     # Common headers for all requests
-    headers = {"X-API-Key": API_KEY, "User-Agent": USER_AGENT}
+    headers = {"X-API-Key": BUNGIE_API_KEY, "User-Agent": USER_AGENT}
 
     # Test 1: Manifest endpoint (should work without auth)
     test_endpoint("https://www.bungie.net/Platform/Destiny2/Manifest/", headers)

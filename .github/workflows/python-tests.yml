@@ -13,9 +13,9 @@ jobs:
       contents: read
       actions: read
     env:
+      # Required environment variables for OAuth functionality
       BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
       BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
-      BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
       BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
       QT_QPA_PLATFORM: offscreen  # Enable headless Qt for CI
     steps:
@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'  # Use Python 3.13 for PySide6 compatibility
+          python-version: '3.8'  # Use Python 3.8 for PyInstaller compatibility
 
       - name: Install system dependencies for GUI testing
         run: |

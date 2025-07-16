@@ -8,10 +8,9 @@ jobs:
     runs-on: windows-latest
 
     env:
-      # Inject secrets as env variables—NEVER store in repo or .env
+      # Required secrets for OAuth functionality
       BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
       BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
-      BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
       BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
 
     steps:
@@ -26,10 +25,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Set up Python 3.13
+      - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.8'
 
       - name: Upgrade pip and wheel
         run: |
@@ -51,21 +50,19 @@ jobs:
           $missing = @()
           if ([string]::IsNullOrEmpty($env:BUNGIE_API_KEY)) { $missing += "BUNGIE_API_KEY" }
           if ([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_ID)) { $missing += "BUNGIE_CLIENT_ID" }
-          if ([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_SECRET)) { $missing += "BUNGIE_CLIENT_SECRET" }
           if ([string]::IsNullOrEmpty($env:BUNGIE_REDIRECT_URI)) { $missing += "BUNGIE_REDIRECT_URI" }
           if ($missing.Count -gt 0) {
-            Write-Error "Missing required secrets: $($missing -join ', '). Build failed."
+            Write-Error "Missing required secrets: $($missing -join ', '). Build requires valid OAuth configuration."
             exit 1
           }
-          Write-Output "All required secrets are present."
+          Write-Output "All required OAuth secrets are present."
         shell: pwsh
 
       - name: Verify secrets for build
         run: |
-          Write-Output "Checking secret availability (values hidden for security):"
+          Write-Output "Checking OAuth configuration (values hidden for security):"
           Write-Output "BUNGIE_API_KEY: $([string]::IsNullOrEmpty($env:BUNGIE_API_KEY) ? 'NOT SET' : 'SET')"
           Write-Output "BUNGIE_CLIENT_ID: $([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_ID) ? 'NOT SET' : 'SET')"
-          Write-Output "BUNGIE_CLIENT_SECRET: $([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_SECRET) ? 'NOT SET' : 'SET')"
           Write-Output "BUNGIE_REDIRECT_URI: $([string]::IsNullOrEmpty($env:BUNGIE_REDIRECT_URI) ? 'NOT SET' : 'SET')"
         shell: pwsh
 

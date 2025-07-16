@@ -46,13 +46,14 @@ def get_project_root():
     return os.path.dirname(os.path.dirname(current_dir))  # Fallback
 
 
-# Load .env variables if present
+# Load .env variables for development/testing only - not required for production
 try:
     from dotenv import load_dotenv  # type: ignore
 
-    load_dotenv()
+    if os.environ.get("RAIDASSIST_DEV_MODE"):
+        load_dotenv()
 except ImportError:
-    pass  # Continue if dotenv is not available; fall back to OS/env/hardcoded
+    pass  # Continue if dotenv is not available; use bundled configuration
 
 BASE_URL = "https://www.bungie.net"
 MANIFEST_URL = f"{BASE_URL}/Platform/Destiny2/Manifest/"
@@ -67,9 +68,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-# Fallback order: .env → OS → hardcoded default
-API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
-HEADERS = {"X-API-Key": API_KEY}
+# Bungie API configuration
+BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
+HEADERS = {"X-API-Key": BUNGIE_API_KEY}
 
 
 def fetch_manifest():

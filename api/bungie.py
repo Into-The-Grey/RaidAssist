@@ -5,13 +5,14 @@ from typing import Any, Dict, Optional
 
 import requests
 
-# Load .env variables if present
+# Load .env variables for development/testing only - not required for production
 try:
     from dotenv import load_dotenv  # type: ignore
 
-    load_dotenv()
+    if os.environ.get("RAIDASSIST_DEV_MODE"):
+        load_dotenv()
 except ImportError:
-    pass  # Continue if dotenv is not available; fall back to OS/env/hardcoded
+    pass  # Continue if dotenv is not available; use bundled configuration
 
 # Fallback implementations first
 import logging
@@ -61,7 +62,24 @@ except ImportError:
 USER_AGENT = "RaidAssist/1.0"
 
 
-from auth_server import get_auth_code
+# Import OAuth functionality from new PKCE implementation
+from .oauth import get_access_token, is_authenticated, clear_session
+
+
+def logout_user():
+    """
+    Logout the current user by clearing stored OAuth session.
+
+    Returns:
+        bool: True if logout successful
+    """
+    try:
+        clear_session()
+        logger.info("User logged out successfully")
+        return True
+    except Exception as e:
+        logger.error(f"Logout failed: {e}")
+        return False
 
 
 def get_project_root():
@@ -80,12 +98,12 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(SESSION_PATH), exist_ok=True)
 
-# Fallback order: .env → OS → hardcoded default
-API_KEY = os.environ.get("BUNGIE_API_KEY") or "YOUR_BUNGIE_API_KEY"
-BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "")
-BUNGIE_CLIENT_SECRET = os.environ.get("BUNGIE_CLIENT_SECRET", "")
+# Bungie API configuration - requires setup for OAuth to work
+# Set these environment variables for the application to function:
+BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
+BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "your_client_id_here")
 BUNGIE_REDIRECT_URI = os.environ.get(
-    "BUNGIE_REDIRECT_URI", "https://localhost:7777/callback"
+    "BUNGIE_REDIRECT_URI", "http://localhost:7777/callback"
 )
 
 PROFILE_CACHE_PATH = os.path.join(CACHE_DIR, "profile.json")
@@ -108,129 +126,59 @@ def _rate_limit():
     LAST_REQUEST_TIME = time.time()
 
 
-def prompt_for_oauth_token():
+def authenticate_user():
     """
-    Prompt user for OAuth authentication and return access token.
+    Authenticate user with Bungie using modern OAuth PKCE flow.
+
+    This function triggers the OAuth flow if needed and returns success status.
+    All configuration is bundled - no user setup required.
 
     Returns:
-        str: Access token if successful, None if failed
-
-    Raises:
-        Exception: If OAuth flow fails
+        bool: True if authentication successful, False otherwise
     """
-    if not BUNGIE_CLIENT_ID or not BUNGIE_CLIENT_SECRET:
-        raise ValueError("Bungie OAuth credentials not configured")
-
-    with log_context("oauth_flow"):
-        logger.info("Starting OAuth authentication flow")
-
-        auth_url = (
-            f"https://www.bungie.net/en/OAuth/Authorize"
-            f"?client_id={BUNGIE_CLIENT_ID}"
-            f"&response_type=code"
-            f"&redirect_uri={BUNGIE_REDIRECT_URI}"
-        )
-
+    with log_context("user_authentication"):
         try:
-            # SSL context (use your local certs for dev; comment out for prod with user browser trust)
-            ssl_ctx = None  # or ('localhost.pem', 'localhost-key.pem')
-            code = get_auth_code(auth_url, ssl_context=ssl_ctx)
+            logger.info("Starting user authentication")
 
-            # Exchange code for token
-            logger.info("Exchanging authorization code for access token")
-            token_url = "https://www.bungie.net/platform/app/oauth/token/"
-            data = {
-                "grant_type": "authorization_code",
-                "code": code,
-                "client_id": BUNGIE_CLIENT_ID,
-                "client_secret": BUNGIE_CLIENT_SECRET,
-            }
-            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            # This will automatically handle OAuth flow if needed
+            token = get_access_token()
 
-            _rate_limit()
-            response = requests.post(token_url, data=data, headers=headers, timeout=30)
-            response.raise_for_status()
+            if token:
+                logger.info("User authentication successful")
+                return True
+            else:
+                logger.error("User authentication failed - no token received")
+                return False
 
-            token_json = response.json()
-            access_token = token_json.get("access_token")
-
-            if not access_token:
-                raise ValueError("No access token received from Bungie")
-
-            logger.info("OAuth authentication successful")
-            return access_token
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Network error during OAuth: {e}")
-            raise
         except Exception as e:
-            logger.error(f"OAuth authentication failed: {e}")
-            raise
+            logger.error(f"User authentication failed: {e}")
+            return False
 
 
 def load_token() -> Optional[str]:
     """
-    Load Bungie OAuth access token from the session file.
+    Load or obtain a valid Bungie OAuth access token.
+
+    Uses modern PKCE OAuth flow with bundled credentials.
+    No user configuration required.
 
     Returns:
-        str: Access token if found and valid, else None.
+        str: Valid access token, or None if authentication fails
     """
     with log_context("token_loading"):
-        if os.path.exists(SESSION_PATH):
-            try:
-                with open(SESSION_PATH, "r", encoding="utf-8") as f:
-                    session_data = json.load(f)
-                    token = session_data.get("access_token", "")
-
-                    if token:
-                        # Validate token by checking expiry if available
-                        expires_at = session_data.get("expires_at")
-                        if expires_at and time.time() > expires_at:
-                            logger.info("Token expired, requiring re-authentication")
-                            return None
-
-                        logger.debug("Valid token loaded from session")
-                        return token
-
-            except (json.JSONDecodeError, KeyError, IOError) as e:
-                logger.warning(f"Failed to load token from session: {e}")
-            except Exception as e:
-                logger.error(f"Unexpected error loading token: {e}")
-
-        # If no token found, prompt for OAuth
-        logger.info("No valid token found, initiating OAuth flow")
         try:
-            token = prompt_for_oauth_token()
+            # Use the new OAuth implementation
+            token = get_access_token()
             if token:
-                _save_token(token)
-            return token
+                logger.debug("Valid token obtained")
+                return token
+            else:
+                logger.warning("Failed to obtain access token")
+                return None
+
         except Exception as e:
-            logger.error(f"Failed to obtain OAuth token: {e}")
+            logger.error(f"Failed to load/obtain token: {e}")
             return None
-
-
-def _save_token(token: str, expires_in: int = 3600):
-    """
-    Save token to session file with expiration.
-
-    Args:
-        token: Access token to save
-        expires_in: Token lifetime in seconds (default 1 hour)
-    """
-    try:
-        session_data = {
-            "access_token": token,
-            "expires_at": time.time() + expires_in,
-            "created_at": time.time(),
-        }
-
-        with open(SESSION_PATH, "w", encoding="utf-8") as f:
-            json.dump(session_data, f, indent=2)
-
-        logger.debug("Token saved to session file")
-
-    except Exception as e:
-        logger.error(f"Failed to save token: {e}")
 
 
 def fetch_profile(
@@ -269,7 +217,7 @@ def fetch_profile(
                 url = f"https://www.bungie.net/Platform/Destiny2/{membership_type}/Profile/{membership_id}/"
                 params = {"components": components}
                 headers = {
-                    "X-API-Key": API_KEY,
+                    "X-API-Key": BUNGIE_API_KEY,
                     "Authorization": f"Bearer {token}",
                     "User-Agent": USER_AGENT,
                 }
@@ -518,7 +466,7 @@ def get_membership_info(bungie_tag: str) -> Optional[Dict[str, Any]]:
             # According to Bungie API docs: /Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/
             url = f"https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/-1/{username}/"
             headers = {
-                "X-API-Key": API_KEY,
+                "X-API-Key": BUNGIE_API_KEY,
                 "Authorization": f"Bearer {token}",
                 "User-Agent": USER_AGENT,
             }
@@ -558,7 +506,7 @@ def test_api_connection() -> bool:
     """
     try:
         url = "https://www.bungie.net/Platform/Destiny2/Manifest/"
-        headers = {"X-API-Key": API_KEY, "User-Agent": USER_AGENT}
+        headers = {"X-API-Key": BUNGIE_API_KEY, "User-Agent": USER_AGENT}
 
         _rate_limit()
         response = requests.get(url, headers=headers, timeout=10)
