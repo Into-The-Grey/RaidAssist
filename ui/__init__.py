@@ -34,8 +34,9 @@ if QT_AVAILABLE:
         from .settings import SettingsDialog
 
         UI_AVAILABLE = True
-    except ImportError:
-        pass
+    except ImportError as e:
+        import logging
+        logging.warning("Failed to import UI components: %s. UI_AVAILABLE will remain False.", e)
 
     try:
         from .overlay import Overlay, create_overlay
