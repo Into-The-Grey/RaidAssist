@@ -514,8 +514,9 @@ def get_membership_info(bungie_tag: str) -> Optional[Dict[str, Any]]:
                 logger.error("No authentication token available")
                 return None
 
-            url = "https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/-1/"
-            params = {"displayName": username}
+            # FIXED: Use correct endpoint format with displayName in path
+            # According to Bungie API docs: /Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/
+            url = f"https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/-1/{username}/"
             headers = {
                 "X-API-Key": API_KEY,
                 "Authorization": f"Bearer {token}",
@@ -523,7 +524,7 @@ def get_membership_info(bungie_tag: str) -> Optional[Dict[str, Any]]:
             }
 
             _rate_limit()
-            response = requests.get(url, params=params, headers=headers, timeout=30)
+            response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
 
             data = response.json()
