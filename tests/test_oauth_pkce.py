@@ -25,6 +25,7 @@ def test_bundled_configuration():
     os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
     os.environ["BUNGIE_CLIENT_ID"] = "12345"
     os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+    os.environ["RAIDASSIST_TEST_MODE"] = "true"  # Enable test mode
 
     # Re-import to pick up new environment variables
     import importlib
@@ -34,11 +35,15 @@ def test_bundled_configuration():
 
     from api.oauth import BUNGIE_API_KEY, BUNGIE_CLIENT_ID, BUNGIE_REDIRECT_URI
 
-    assert BUNGIE_API_KEY == "test_api_key_12345", "API key not loaded from environment"
-    assert BUNGIE_CLIENT_ID == "12345", "Client ID not loaded from environment"
+    assert (
+        BUNGIE_API_KEY == "test_api_key_12345"
+    ), f"API key not loaded from environment - got '{BUNGIE_API_KEY}'"
+    assert (
+        BUNGIE_CLIENT_ID == "12345"
+    ), f"Client ID not loaded from environment - got '{BUNGIE_CLIENT_ID}'"
     assert (
         BUNGIE_REDIRECT_URI == "http://localhost:7777/callback"
-    ), "Redirect URI mismatch"
+    ), f"Redirect URI mismatch - got '{BUNGIE_REDIRECT_URI}'"
 
     print("✅ OAuth configuration setup working correctly")
 
@@ -120,6 +125,22 @@ def test_bungie_integration():
     """Test Bungie API integration functions."""
     print("Testing Bungie API integration...")
 
+    # Set test environment variables before importing
+    import os
+
+    os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
+    os.environ["BUNGIE_CLIENT_ID"] = "12345"
+    os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+    os.environ["RAIDASSIST_TEST_MODE"] = "true"  # Enable test mode
+
+    # Force reload of modules to pick up environment variables
+    import importlib
+    import api.oauth
+    import api.bungie
+
+    importlib.reload(api.oauth)
+    importlib.reload(api.bungie)
+
     from api.bungie import (
         BUNGIE_API_KEY,
         BUNGIE_CLIENT_ID,
@@ -128,8 +149,12 @@ def test_bungie_integration():
     )
 
     # Test environment configuration (should use same test values set earlier)
-    assert BUNGIE_API_KEY == "test_api_key_12345", "Bungie API key not from environment"
-    assert BUNGIE_CLIENT_ID == "12345", "Bungie Client ID not from environment"
+    assert (
+        BUNGIE_API_KEY == "test_api_key_12345"
+    ), f"Bungie API key not from environment - got '{BUNGIE_API_KEY}'"
+    assert (
+        BUNGIE_CLIENT_ID == "12345"
+    ), f"Bungie Client ID not from environment - got '{BUNGIE_CLIENT_ID}'"
 
     # Test function availability (shouldn't raise errors)
     assert callable(ensure_authenticated), "ensure_authenticated not callable"

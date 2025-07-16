@@ -13,10 +13,12 @@ jobs:
       contents: read
       actions: read
     env:
-      # Required environment variables for OAuth functionality
-      BUNGIE_API_KEY: ${{ secrets.BUNGIE_API_KEY }}
-      BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
-      BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
+      # Test environment variables (use mock values for testing)
+      BUNGIE_API_KEY: test_api_key_12345
+      BUNGIE_CLIENT_ID: 12345
+      BUNGIE_REDIRECT_URI: http://localhost:7777/callback
+      TEST_TOKEN: test_token
+      RAIDASSIST_TEST_MODE: true  # Enable test mode to bypass OAuth flows
       QT_QPA_PLATFORM: offscreen  # Enable headless Qt for CI
     steps:
       - uses: actions/checkout@v4

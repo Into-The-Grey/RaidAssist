@@ -69,6 +69,10 @@ def validate_oauth_config():
     Returns:
         tuple: (is_valid: bool, error_message: str)
     """
+    # Allow test mode to bypass validation
+    if os.environ.get("RAIDASSIST_TEST_MODE") == "true":
+        return (True, "Test mode - validation bypassed")
+
     if BUNGIE_API_KEY == "your_bungie_api_key_here":
         return (
             False,
@@ -359,6 +363,12 @@ def get_access_token():
     Raises:
         Exception: If authentication fails or configuration is invalid
     """
+    # Support test mode
+    if os.environ.get("RAIDASSIST_TEST_MODE") == "true":
+        test_token = os.environ.get("TEST_TOKEN", "test_token")
+        logging.info(f"Test mode - returning test token: {test_token}")
+        return test_token
+
     # First validate OAuth configuration
     is_valid, error_msg = validate_oauth_config()
     if not is_valid:

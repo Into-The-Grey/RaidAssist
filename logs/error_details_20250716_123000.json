@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2025-07-16T12:30:00.330701",
+    "session_id": "20250716_123000",
+    "level": "ERROR",
+    "message": "Test error message",
+    "exception_type": "ValueError",
+    "exception_message": "Test exception",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ncacord/RaidAssist/tests/test_enhanced_systems.py\", line 87, in test_error_logging_with_exception\n    raise ValueError(\"Test exception\")\nValueError: Test exception\n",
+    "context_stack": [],
+    "extra": {}
+  }
+]
