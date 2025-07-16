@@ -3,32 +3,28 @@
 
 """
 interface.py — Completely overhauled UI for RaidAssist with advanced features.
-
-Major improvements:
-- Comprehensive error handling and logging
-- Advanced overlay system (7-8/10 quality)
-- Better user experience and feedback
-- Robust data management
-- Performance optimizations
-- Enhanced visual design
 """
 
-import os
-import sys
 import csv
 import json
-import time
 import logging
-from typing import Dict, List, Any, Optional
+import os
+import sys
+import time
+from typing import Any, Dict, List, Optional
 
 # Enhanced error handling and logging
 try:
+    from utils.error_handler import (
+        get_error_handler,  # type: ignore
+        handle_error,
+        safe_execute,
+    )
     from utils.logging_manager import get_logger, log_context  # type: ignore
-    from utils.error_handler import safe_execute, handle_exception, error_handler  # type: ignore
 
-    ENHANCED_ERROR_HANDLING = True
+    ERROR_HANDLING = True
 except ImportError:
-    ENHANCED_ERROR_HANDLING = False
+    ERROR_HANDLING = False
 
     def get_logger(name):
         return logging.getLogger(name)
@@ -50,47 +46,48 @@ except ImportError:
             return kwargs.get("default_return")
 
 
+from PySide6.QtCore import (
+    QEasingCurve,
+    QPropertyAnimation,  # type: ignore
+    Qt,
+    QThread,
+    QTimer,
+    Signal,
+)
+from PySide6.QtGui import QColor, QFont, QIcon, QPalette, QPixmap  # type: ignore
+
 # Qt imports
-from PySide2.QtWidgets import (  # type: ignore
+from PySide6.QtWidgets import (
     QApplication,
-    QWidget,
-    QVBoxLayout,
+    QCheckBox,  # type: ignore
+    QComboBox,
+    QFileDialog,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
-    QPushButton,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
-    QTabWidget,
-    QLineEdit,
-    QFileDialog,
-    QMessageBox,
-    QStatusBar,
-    QSlider,
-    QSystemTrayIcon,
     QMenu,
+    QMessageBox,
     QProgressBar,
-    QFrame,
-    QSplashScreen,
-    QCheckBox,
-    QGroupBox,
-    QGridLayout,
-    QTextEdit,
-    QSplitter,
+    QPushButton,
     QScrollArea,
+    QSlider,
     QSpinBox,
-    QComboBox,
+    QSplashScreen,
+    QSplitter,
+    QStatusBar,
+    QSystemTrayIcon,
+    QTabWidget,
+    QTextEdit,
     QTreeWidget,
     QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide2.QtCore import (  # type: ignore
-    Qt,
-    QTimer,
-    QThread,
-    Signal,
-    QPropertyAnimation,
-    QEasingCurve,
-)
-from PySide2.QtGui import QIcon, QPixmap, QFont, QColor, QPalette  # type: ignore
 
 # Import application modules
 from api.bungie import (
@@ -99,24 +96,24 @@ from api.bungie import (
     load_cached_profile,
     test_api_connection,
 )
+from api.manifest import get_item_info, load_item_definitions
 from api.parse_profile import (
-    load_profile,
-    extract_red_borders,
     extract_catalysts,
     extract_exotics,
+    extract_red_borders,
+    load_profile,
 )
-from api.manifest import load_item_definitions, get_item_info
-from ui.settings import SettingsDialog, load_settings
-from ui.loading import LoadingDialog
 from ui.api_tester import ApiTesterDialog
+from ui.loading import LoadingDialog
+from ui.settings import SettingsDialog, load_settings
 
-# Enhanced overlay system
+# Overlay system (name is fine; it's an import, not a UI class)
 try:
-    from ui.overlay import create_advanced_overlay, AdvancedOverlay
+    from ui.overlay import Overlay, create_overlay
 
-    ADVANCED_OVERLAY_AVAILABLE = True
+    OVERLAY_AVAILABLE = True
 except ImportError:
-    ADVANCED_OVERLAY_AVAILABLE = False
+    OVERLAY_AVAILABLE = False
 
 # Hotkey support
 try:
@@ -191,17 +188,9 @@ class DataRefreshThread(QThread):
             self.error_occurred.emit(str(e))
 
 
-class EnhancedRaidAssistUI(QWidget):
+class RaidAssistUI(QWidget):
     """
-    Completely enhanced main application window.
-
-    Features:
-    - Advanced error handling and recovery
-    - Professional UI design
-    - Background data loading
-    - Advanced overlay system (7-8/10 quality)
-    - Comprehensive progress tracking
-    - Real-time updates and notifications
+    Main application window for RaidAssist.
     """
 
     # UI Constants
@@ -218,17 +207,17 @@ class EnhancedRaidAssistUI(QWidget):
 
     def _initialize_logging(self):
         """Initialize logging and error handling."""
-        if ENHANCED_ERROR_HANDLING:
+        if ERROR_HANDLING:
             self.logger = get_logger("raidassist.ui")
-            error_handler.set_ui_parent(self)
+            get_error_handler().set_ui_parent(self)
         else:
             self.logger = get_logger("raidassist")
 
     def _initialize_application(self):
         """Initialize the application with comprehensive setup."""
         try:
-            with log_context("enhanced_ui_initialization"):
-                self.logger.info("Starting enhanced RaidAssist UI initialization")
+            with log_context("ui_initialization"):
+                self.logger.info("Starting RaidAssist UI initialization")
 
                 # Show splash screen
                 self._show_splash_screen()
@@ -244,7 +233,7 @@ class EnhancedRaidAssistUI(QWidget):
                 # Load initial data
                 self._start_initial_data_load()
 
-                self.logger.info("Enhanced UI initialization completed successfully")
+                self.logger.info("UI initialization completed successfully")
 
         except Exception as e:
             self._handle_initialization_error(e)
@@ -265,8 +254,8 @@ class EnhancedRaidAssistUI(QWidget):
         """
         )
         self.splash.showMessage(
-            "🎮 Initializing RaidAssist...\nEnhanced Edition",
-            Qt.AlignCenter | Qt.AlignBottom,
+            "🎮 Initializing RaidAssist...",
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom,
             QColor("#00d4ff"),
         )
         self.splash.show()
@@ -284,7 +273,7 @@ class EnhancedRaidAssistUI(QWidget):
 
         self.splash.showMessage(
             "🔐 Authentication verified...",
-            Qt.AlignCenter | Qt.AlignBottom,
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom,
             QColor("#00ff00"),
         )
         QApplication.processEvents()
@@ -312,18 +301,18 @@ class EnhancedRaidAssistUI(QWidget):
         self._connection_status = "Unknown"
 
         # Overlay references
-        self.advanced_overlay_ref: Optional[AdvancedOverlay] = None
+        self.overlay_ref: Optional[Overlay] = None
 
         self.splash.showMessage(
             "📊 Data structures initialized...",
-            Qt.AlignCenter | Qt.AlignBottom,
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom,
             QColor("#00d4ff"),
         )
         QApplication.processEvents()
 
     def _setup_window(self):
         """Setup the main window with enhanced appearance."""
-        self.setWindowTitle("RaidAssist Enhanced - Meta Progression Assistant")
+        self.setWindowTitle("RaidAssist - Meta Progression Assistant")
         self.setWindowIcon(QIcon(get_asset_path("raidassist_icon.png")))
         self.setMinimumSize(900, 700)
         self.resize(1200, 800)
@@ -521,7 +510,7 @@ class EnhancedRaidAssistUI(QWidget):
 
     def _center_window(self):
         """Center the window on screen."""
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         size = self.geometry()
         self.move(
             (screen.width() - size.width()) // 2, (screen.height() - size.height()) // 2
@@ -542,7 +531,7 @@ class EnhancedRaidAssistUI(QWidget):
 
         self.splash.showMessage(
             "🎨 UI components created...",
-            Qt.AlignCenter | Qt.AlignBottom,
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom,
             QColor("#00d4ff"),
         )
         QApplication.processEvents()
@@ -559,7 +548,7 @@ class EnhancedRaidAssistUI(QWidget):
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(2)
 
-        title_label = QLabel("🎮 RaidAssist Enhanced")
+        title_label = QLabel("🎮 RaidAssist")
         title_label.setProperty("heading", True)
         title_layout.addWidget(title_label)
 
@@ -587,7 +576,7 @@ class EnhancedRaidAssistUI(QWidget):
     def _setup_main_content(self):
         """Setup the main content area with enhanced tabs."""
         # Create main splitter
-        main_splitter = QSplitter(Qt.Horizontal)
+        main_splitter = QSplitter(Qt.Orientation.Horizontal)
 
         # Left panel - quick stats
         self._setup_stats_panel(main_splitter)
@@ -605,7 +594,7 @@ class EnhancedRaidAssistUI(QWidget):
     def _setup_stats_panel(self, parent):
         """Setup the quick stats panel."""
         stats_frame = QFrame()
-        stats_frame.setFrameStyle(QFrame.StyledPanel)
+        stats_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         stats_layout = QVBoxLayout(stats_frame)
 
         # Panel title
@@ -648,7 +637,7 @@ class EnhancedRaidAssistUI(QWidget):
         controls_layout.setSpacing(6)
 
         self.refresh_button = QPushButton("🔄 Refresh Data")
-        self.overlay_button = QPushButton("🎮 Advanced Overlay")
+        self.overlay_button = QPushButton("🎮 Overlay")
         self.settings_button = QPushButton("⚙️ Settings")
 
         controls_layout.addWidget(self.refresh_button)
@@ -663,7 +652,7 @@ class EnhancedRaidAssistUI(QWidget):
     def _create_stat_widget(self, title: str, value: str) -> QFrame:
         """Create a statistics display widget."""
         widget = QFrame()
-        widget.setFrameStyle(QFrame.StyledPanel)
+        widget.setFrameStyle(QFrame.Shape.StyledPanel)
         widget.setStyleSheet(
             """
             QFrame {
@@ -688,7 +677,7 @@ class EnhancedRaidAssistUI(QWidget):
         layout.addWidget(value_label)
 
         # Store reference to value label for updates
-        widget.value_label = value_label
+        widget.value_label = value_label  # type: ignore[misc]
 
         return widget
 
@@ -701,17 +690,17 @@ class EnhancedRaidAssistUI(QWidget):
         # Create tab widget
         self.tabs = QTabWidget()
 
-        # Setup enhanced tabs
-        self._setup_enhanced_red_borders_tab()
-        self._setup_enhanced_catalysts_tab()
-        self._setup_enhanced_exotics_tab()
+        # Setup tabs
+        self._setup_red_borders_tab()
+        self._setup_catalysts_tab()
+        self._setup_exotics_tab()
         self._setup_tools_tab()
 
         tabs_layout.addWidget(self.tabs)
         parent.addWidget(tabs_frame)
 
-    def _setup_enhanced_red_borders_tab(self):
-        """Setup enhanced red borders tab."""
+    def _setup_red_borders_tab(self):
+        """Setup red borders tab."""
         tab_widget = QWidget()
         layout = QVBoxLayout(tab_widget)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -734,7 +723,7 @@ class EnhancedRaidAssistUI(QWidget):
 
         layout.addWidget(search_frame)
 
-        # List widget with enhanced features
+        # List widget with features
         self.red_border_list = QListWidget()
         self.red_border_list.setAlternatingRowColors(True)
         layout.addWidget(self.red_border_list)
@@ -746,8 +735,8 @@ class EnhancedRaidAssistUI(QWidget):
 
         self.tabs.addTab(tab_widget, "🔴 Red Borders")
 
-    def _setup_enhanced_catalysts_tab(self):
-        """Setup enhanced catalysts tab."""
+    def _setup_catalysts_tab(self):
+        """Setup catalysts tab."""
         tab_widget = QWidget()
         layout = QVBoxLayout(tab_widget)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -782,8 +771,8 @@ class EnhancedRaidAssistUI(QWidget):
 
         self.tabs.addTab(tab_widget, "⚡ Catalysts")
 
-    def _setup_enhanced_exotics_tab(self):
-        """Setup enhanced exotics tab."""
+    def _setup_exotics_tab(self):
+        """Setup exotics tab."""
         tab_widget = QWidget()
         layout = QVBoxLayout(tab_widget)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -847,11 +836,11 @@ class EnhancedRaidAssistUI(QWidget):
         overlay_group = QGroupBox("🎮 Overlay")
         overlay_layout = QVBoxLayout(overlay_group)
 
-        self.overlay_advanced_btn = QPushButton("Advanced Overlay")
+        self.overlay_btn = QPushButton("Overlay")
         self.overlay_config_btn = QPushButton("Overlay Settings")
         self.overlay_test_btn = QPushButton("Test Overlay")
 
-        overlay_layout.addWidget(self.overlay_advanced_btn)
+        overlay_layout.addWidget(self.overlay_btn)
         overlay_layout.addWidget(self.overlay_config_btn)
         overlay_layout.addWidget(self.overlay_test_btn)
 
@@ -861,11 +850,11 @@ class EnhancedRaidAssistUI(QWidget):
         system_group = QGroupBox("⚙️ System")
         system_layout = QVBoxLayout(system_group)
 
-        self.settings_advanced_btn = QPushButton("Advanced Settings")
+        self.settings_btn = QPushButton("Settings")
         self.logs_viewer_btn = QPushButton("View Logs")
         self.diagnostics_btn = QPushButton("Run Diagnostics")
 
-        system_layout.addWidget(self.settings_advanced_btn)
+        system_layout.addWidget(self.settings_btn)
         system_layout.addWidget(self.logs_viewer_btn)
         system_layout.addWidget(self.diagnostics_btn)
 
@@ -897,14 +886,14 @@ class EnhancedRaidAssistUI(QWidget):
         tray_icon = QIcon(tray_icon_path) if os.path.exists(tray_icon_path) else QIcon()
 
         self.tray_icon = QSystemTrayIcon(tray_icon, self)
-        self.tray_icon.setToolTip("RaidAssist Enhanced - Meta Progression Assistant")
+        self.tray_icon.setToolTip("RaidAssist - Meta Progression Assistant")
 
         # Enhanced tray menu
         tray_menu = QMenu()
 
         # Main actions
         tray_menu.addAction("🏠 Show Dashboard", self._show_dashboard)
-        tray_menu.addAction("🎮 Advanced Overlay", self._show_advanced_overlay)
+        tray_menu.addAction("🎮 Overlay", self._show_overlay)
         tray_menu.addSeparator()
 
         # Quick actions
@@ -914,7 +903,7 @@ class EnhancedRaidAssistUI(QWidget):
 
         # Settings and exit
         tray_menu.addAction("⚙️ Settings", self.open_settings)
-        tray_menu.addAction("❌ Quit", QApplication.instance().quit)
+        tray_menu.addAction("❌ Quit", self._quit_application)
 
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.activated.connect(self._on_tray_activated)
@@ -924,7 +913,7 @@ class EnhancedRaidAssistUI(QWidget):
         """Setup signal connections."""
         # Button connections
         self.refresh_button.clicked.connect(self.refresh_data)
-        self.overlay_button.clicked.connect(self._show_advanced_overlay)
+        self.overlay_button.clicked.connect(self._show_overlay)
         self.settings_button.clicked.connect(self.open_settings)
 
         # Search connections
@@ -948,8 +937,8 @@ class EnhancedRaidAssistUI(QWidget):
             self.api_tester_btn.clicked.connect(self._open_api_tester)
 
             # Additional tools connections
-            self.overlay_advanced_btn.clicked.connect(self._show_advanced_overlay)
-            self.settings_advanced_btn.clicked.connect(self.open_settings)
+            self.overlay_btn.clicked.connect(self._show_overlay)
+            self.settings_btn.clicked.connect(self.open_settings)
 
     def _setup_background_services(self):
         """Setup background services and timers."""
@@ -976,8 +965,8 @@ class EnhancedRaidAssistUI(QWidget):
 
         try:
             # Register hotkeys using keybind
-            keybind.register("ctrl+alt+r", self.refresh_data)
-            keybind.register("ctrl+alt+o", self._toggle_advanced_overlay)
+            keybind.register("ctrl+alt+r", self.refresh_data)  # type: ignore[misc]
+            keybind.register("ctrl+alt+o", self._toggle_overlay)  # type: ignore[misc]
             self.logger.info("Global hotkeys registered successfully")
         except Exception as e:
             self.logger.warning(f"Failed to setup hotkeys: {e}")
@@ -1001,7 +990,7 @@ class EnhancedRaidAssistUI(QWidget):
         """Start loading initial data in background."""
         self.splash.showMessage(
             "📡 Loading initial data...",
-            Qt.AlignCenter | Qt.AlignBottom,
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom,
             QColor("#00d4ff"),
         )
         QApplication.processEvents()
@@ -1186,7 +1175,7 @@ class EnhancedRaidAssistUI(QWidget):
         rb_completed = sum(1 for item in self._rb_items if item["percent"] >= 100)
         rb_total = len(self._rb_items)
         rb_percent = int(100 * rb_completed / rb_total) if rb_total > 0 else 0
-        self.rb_summary.value_label.setText(
+        self.rb_summary.value_label.setText(  # type: ignore[misc]
             f"{rb_completed}/{rb_total} ({rb_percent}%)"
         )
 
@@ -1194,13 +1183,13 @@ class EnhancedRaidAssistUI(QWidget):
         cat_completed = sum(1 for item in self._cat_items if item["percent"] >= 100)
         cat_total = len(self._cat_items)
         cat_percent = int(100 * cat_completed / cat_total) if cat_total > 0 else 0
-        self.cat_summary.value_label.setText(
+        self.cat_summary.value_label.setText(  # type: ignore[misc]
             f"{cat_completed}/{cat_total} ({cat_percent}%)"
         )
 
         # Exotics stats
         ex_total = len(self._exotic_items)
-        self.ex_summary.value_label.setText(f"{ex_total}")
+        self.ex_summary.value_label.setText(f"{ex_total}")  # type: ignore[misc]
 
     def _update_red_borders_display(self):
         """Update red borders list display."""
@@ -1220,11 +1209,11 @@ class EnhancedRaidAssistUI(QWidget):
 
             # Color coding based on progress
             if item["percent"] >= 100:
-                list_item.setData(Qt.TextColorRole, QColor("#00ff00"))
+                list_item.setData(Qt.ItemDataRole.ForegroundRole, QColor("#00ff00"))
             elif item["percent"] >= 50:
-                list_item.setData(Qt.TextColorRole, QColor("#ffff00"))
+                list_item.setData(Qt.ItemDataRole.ForegroundRole, QColor("#ffff00"))
             else:
-                list_item.setData(Qt.TextColorRole, QColor("#ffffff"))
+                list_item.setData(Qt.ItemDataRole.ForegroundRole, QColor("#ffffff"))
 
             self.red_border_list.addItem(list_item)
 
@@ -1251,9 +1240,9 @@ class EnhancedRaidAssistUI(QWidget):
 
             # Color coding
             if item["percent"] >= 100:
-                list_item.setData(Qt.TextColorRole, QColor("#00ff00"))
+                list_item.setData(Qt.ItemDataRole.ForegroundRole, QColor("#00ff00"))
             elif item["percent"] >= 50:
-                list_item.setData(Qt.TextColorRole, QColor("#ffff00"))
+                list_item.setData(Qt.ItemDataRole.ForegroundRole, QColor("#ffff00"))
 
             self.catalyst_list.addItem(list_item)
 
@@ -1328,27 +1317,27 @@ class EnhancedRaidAssistUI(QWidget):
         self._update_exotics_display()
 
     # Overlay Methods
-    def _show_advanced_overlay(self):
-        """Show the advanced overlay system."""
-        if not ADVANCED_OVERLAY_AVAILABLE:
+    def _show_overlay(self):
+        """Show the overlay system."""
+        if not OVERLAY_AVAILABLE:
             QMessageBox.warning(
                 self,
-                "Advanced Overlay Unavailable",
-                "The advanced overlay system is not available.\n"
+                "Overlay Unavailable",
+                "The overlay system is not available.\n"
                 "Please check that all required components are installed.",
             )
             return
 
         try:
             if (
-                self.advanced_overlay_ref
-                and hasattr(self.advanced_overlay_ref, "isVisible")
-                and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+                self.overlay_ref
+                and hasattr(self.overlay_ref, "isVisible")
+                and getattr(self.overlay_ref, "isVisible", lambda: False)()
             ):
-                if hasattr(self.advanced_overlay_ref, "raise_"):
-                    getattr(self.advanced_overlay_ref, "raise_", lambda: None)()
-                if hasattr(self.advanced_overlay_ref, "activateWindow"):
-                    getattr(self.advanced_overlay_ref, "activateWindow", lambda: None)()
+                if hasattr(self.overlay_ref, "raise_"):
+                    getattr(self.overlay_ref, "raise_", lambda: None)()
+                if hasattr(self.overlay_ref, "activateWindow"):
+                    getattr(self.overlay_ref, "activateWindow", lambda: None)()
                 return
 
             # Prepare data for overlay
@@ -1358,52 +1347,48 @@ class EnhancedRaidAssistUI(QWidget):
                 "exotics": [item["raw"] for item in self._exotic_items],
             }
 
-            self.advanced_overlay_ref = create_advanced_overlay(None)
-            if self.advanced_overlay_ref:
-                if hasattr(self.advanced_overlay_ref, "update_data"):
-                    getattr(self.advanced_overlay_ref, "update_data", lambda x: None)(
+            self.overlay_ref = create_overlay(None)
+            if self.overlay_ref:
+                if hasattr(self.overlay_ref, "update_data"):
+                    getattr(self.overlay_ref, "update_data", lambda x: None)(
                         overlay_data
                     )
-                if hasattr(self.advanced_overlay_ref, "show"):
-                    getattr(self.advanced_overlay_ref, "show", lambda: None)()
-                self.logger.info("Advanced overlay opened successfully")
+                if hasattr(self.overlay_ref, "show"):
+                    getattr(self.overlay_ref, "show", lambda: None)()
+                self.logger.info("Overlay opened successfully")
             else:
                 raise RuntimeError("Failed to create overlay instance")
 
         except Exception as e:
-            self.logger.error(f"Failed to show advanced overlay: {e}")
-            QMessageBox.warning(
-                self, "Overlay Error", f"Failed to open advanced overlay:\n{e}"
-            )
+            self.logger.error(f"Failed to show overlay: {e}")
+            QMessageBox.warning(self, "Overlay Error", f"Failed to open overlay:\n{e}")
 
-    def _toggle_advanced_overlay(self):
-        """Toggle advanced overlay visibility."""
+    def _toggle_overlay(self):
+        """Toggle overlay visibility."""
         if (
-            self.advanced_overlay_ref
-            and hasattr(self.advanced_overlay_ref, "isVisible")
-            and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+            self.overlay_ref
+            and hasattr(self.overlay_ref, "isVisible")
+            and getattr(self.overlay_ref, "isVisible", lambda: False)()
         ):
-            if hasattr(self.advanced_overlay_ref, "close"):
-                getattr(self.advanced_overlay_ref, "close", lambda: None)()
+            if hasattr(self.overlay_ref, "close"):
+                getattr(self.overlay_ref, "close", lambda: None)()
         else:
-            self._show_advanced_overlay()
+            self._show_overlay()
 
     def _update_overlay_data(self):
         """Update overlay with current data."""
         if (
-            self.advanced_overlay_ref
-            and hasattr(self.advanced_overlay_ref, "isVisible")
-            and getattr(self.advanced_overlay_ref, "isVisible", lambda: False)()
+            self.overlay_ref
+            and hasattr(self.overlay_ref, "isVisible")
+            and getattr(self.overlay_ref, "isVisible", lambda: False)()
         ):
             overlay_data = {
                 "red_borders": [item["raw"] for item in self._rb_items],
                 "catalysts": [item["raw"] for item in self._cat_items],
                 "exotics": [item["raw"] for item in self._exotic_items],
             }
-            if hasattr(self.advanced_overlay_ref, "update_data"):
-                getattr(self.advanced_overlay_ref, "update_data", lambda x: None)(
-                    overlay_data
-                )
+            if hasattr(self.overlay_ref, "update_data"):
+                getattr(self.overlay_ref, "update_data", lambda x: None)(overlay_data)
 
     # Utility Methods
     def _check_connection(self):
@@ -1500,7 +1485,7 @@ class EnhancedRaidAssistUI(QWidget):
     # System tray handlers
     def _on_tray_activated(self, reason):
         """Handle system tray activation."""
-        if reason == QSystemTrayIcon.DoubleClick:
+        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
             self._show_dashboard()
 
     def _show_dashboard(self):
@@ -1519,7 +1504,7 @@ class EnhancedRaidAssistUI(QWidget):
             self.tray_icon.showMessage(
                 "RaidAssist Quick Stats",
                 f"{rb_stats}\n{cat_stats}\n{ex_stats}",
-                QSystemTrayIcon.Information,
+                QSystemTrayIcon.MessageIcon.Information,
                 5000,
             )
 
@@ -1528,7 +1513,7 @@ class EnhancedRaidAssistUI(QWidget):
         # Cleanup hotkeys before closing
         if HOTKEY_AVAILABLE:
             try:
-                keybind.clear()
+                keybind.clear()  # type: ignore[misc]
             except:
                 pass
 
@@ -1539,18 +1524,24 @@ class EnhancedRaidAssistUI(QWidget):
         else:
             event.accept()
 
+    def _quit_application(self):
+        """Quit the application properly."""
+        app = QApplication.instance()
+        if app:
+            app.quit()
+
 
 if __name__ == "__main__":
-    """Enhanced entry point for testing."""
+    """Entry point for testing."""
     app = QApplication(sys.argv)
 
     # Setup application properties
-    app.setApplicationName("RaidAssist Enhanced")
+    app.setApplicationName("RaidAssist")
     app.setApplicationVersion("2.0.0")
     app.setOrganizationName("RaidAssist")
 
     # Create and show main window
-    window = EnhancedRaidAssistUI()
+    window = RaidAssistUI()
     window.show()
 
     sys.exit(app.exec_())

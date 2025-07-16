@@ -26,10 +26,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.13'
 
       - name: Upgrade pip and wheel
         run: |
@@ -42,26 +42,34 @@ jobs:
           pip install pyinstaller
 
       - name: Create logs directory
-        run: mkdir -p logs
+        run: mkdir logs
 
-      - name: Verify enhanced systems
+      - name: Verify systems
         run: |
-          python tests/verify_enhanced.py || echo "Verification completed with warnings"
+          python tests/run_tests.py --systems || echo "System verification completed with warnings"
 
       - name: Check required secrets
         run: |
-          if [ -z "${BUNGIE_API_KEY}" ] || [ -z "${BUNGIE_CLIENT_ID}" ] || [ -z "${BUNGIE_CLIENT_SECRET}" ] || [ -z "${BUNGIE_REDIRECT_URI}" ]; then
-            echo "Missing required secrets. Build failed."
+          $missing = @()
+          if ([string]::IsNullOrEmpty($env:BUNGIE_API_KEY)) { $missing += "BUNGIE_API_KEY" }
+          if ([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_ID)) { $missing += "BUNGIE_CLIENT_ID" }
+          if ([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_SECRET)) { $missing += "BUNGIE_CLIENT_SECRET" }
+          if ([string]::IsNullOrEmpty($env:BUNGIE_REDIRECT_URI)) { $missing += "BUNGIE_REDIRECT_URI" }
+          if ($missing.Count -gt 0) {
+            Write-Error "Missing required secrets: $($missing -join ', '). Build failed."
             exit 1
-          fi
-        shell: bash
+          }
+          Write-Output "All required secrets are present."
+        shell: pwsh
 
       - name: Verify secrets for build
         run: |
-          echo "BUNGIE_API_KEY=${{ secrets.BUNGIE_API_KEY }}"
-          echo "BUNGIE_CLIENT_ID=${{ secrets.BUNGIE_CLIENT_ID }}"
-          echo "BUNGIE_CLIENT_SECRET=${{ secrets.BUNGIE_CLIENT_SECRET }}"
-          echo "BUNGIE_REDIRECT_URI=${{ secrets.BUNGIE_REDIRECT_URI }}"
+          Write-Output "Checking secret availability (values hidden for security):"
+          Write-Output "BUNGIE_API_KEY: $([string]::IsNullOrEmpty($env:BUNGIE_API_KEY) ? 'NOT SET' : 'SET')"
+          Write-Output "BUNGIE_CLIENT_ID: $([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_ID) ? 'NOT SET' : 'SET')"
+          Write-Output "BUNGIE_CLIENT_SECRET: $([string]::IsNullOrEmpty($env:BUNGIE_CLIENT_SECRET) ? 'NOT SET' : 'SET')"
+          Write-Output "BUNGIE_REDIRECT_URI: $([string]::IsNullOrEmpty($env:BUNGIE_REDIRECT_URI) ? 'NOT SET' : 'SET')"
+        shell: pwsh
 
       - name: Build with PyInstaller
         run: pyinstaller raidassist.spec
@@ -77,4 +85,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Build-Logs
-          path: RaidAssist/logs/
+          path: logs/

@@ -16,17 +16,11 @@ __version__ = "2.0.0"
 __author__ = "Nicholas Acord"
 
 # Core API components
-from .bungie import (
-    ensure_authenticated,
-    fetch_profile,
-    load_cached_profile,
-    test_api_connection,
-)
-
-from .manifest import (
-    load_item_definitions,
-    get_item_info,  # This function exists, get_item_name doesn't
-)
+from .bungie import (ensure_authenticated, fetch_profile, load_cached_profile,
+                     test_api_connection)
+from .manifest import \
+    get_item_info  # This function exists, get_item_name doesn't
+from .manifest import load_item_definitions
 
 # OAuth functionality (may not be a class)
 try:
@@ -36,12 +30,8 @@ try:
 except ImportError:
     OAUTH_CLASS_AVAILABLE = False
 
-from .parse_profile import (
-    load_profile,
-    extract_red_borders,
-    extract_catalysts,
-    extract_exotics,
-)
+from .parse_profile import (extract_catalysts, extract_exotics,
+                            extract_red_borders, load_profile)
 
 # Exotics module (may not have collect_exotics function)
 try:

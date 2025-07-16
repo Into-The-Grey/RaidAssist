@@ -1,13 +1,10 @@
-import os
 import json
-import pytest # type: ignore
+import os
 
-from api.parse_profile import (
-    load_profile,
-    extract_red_borders,
-    extract_exotics,
-    extract_catalysts,
-)
+import pytest  # type: ignore
+
+from api.parse_profile import (extract_catalysts, extract_exotics,
+                               extract_red_borders, load_profile)
 
 
 def test_parse_profile_load_and_extract(tmp_path, monkeypatch):

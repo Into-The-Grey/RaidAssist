@@ -1,9 +1,10 @@
 # tests/test_manifest.py
 
+import json
 import os
 import shutil
-import pytest # type: ignore
-import json
+
+import pytest  # type: ignore
 
 from api import manifest
 
@@ -49,20 +50,20 @@ def test_manifest_download_and_load(tmp_path):
 
 def test_get_item_display():
     item_defs = manifest.load_item_definitions()
-    
+
     # If manifest is empty, skip this test
     if not item_defs:
         pytest.skip("Manifest is empty, cannot test item display")
-    
+
     # Test with any available item from the manifest
     first_hash = next(iter(item_defs))
     name = manifest.get_item_display(first_hash, item_defs)
     assert isinstance(name, str)
-    
+
     # Should not be empty and should not be "Unknown Item" since we're using a valid hash
     assert len(name) > 0
     assert not name.startswith("Unknown Item")
-    
+
     # Test with an invalid hash that definitely won't exist
     invalid_hash = "99999999999"
     unknown_name = manifest.get_item_display(invalid_hash, item_defs)

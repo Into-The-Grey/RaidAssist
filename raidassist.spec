@@ -15,9 +15,9 @@ a = Analysis(
         ('README.md', '.'),
     ],
     hiddenimports=[
-        'PySide2.QtCore',
-        'PySide2.QtWidgets', 
-        'PySide2.QtGui',
+        'PySide6.QtCore',
+        'PySide6.QtWidgets', 
+        'PySide6.QtGui',
         'utils.logging_manager',
         'utils.error_handler',
         'ui.interface',

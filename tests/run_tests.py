@@ -9,13 +9,13 @@ Runs all tests with proper configuration and generates reports.
 Supports fallback testing when pytest is not available.
 """
 
-import sys
+import argparse
 import os
 import subprocess
-from pathlib import Path
-import argparse
+import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -88,12 +88,12 @@ def check_dependencies():
     return all_available
 
 
-def run_enhanced_system_tests():
-    """Run enhanced system tests."""
-    print("\n🎮 Running Enhanced System Tests...")
+def run_system_tests():
+    """Run system tests."""
+    print("\n🎮 Running System Tests...")
     return run_command(
-        "python -m pytest tests/test_enhanced_systems.py -v --tb=short",
-        "Enhanced Systems Tests",
+        "python -m pytest tests/test_systems.py -v --tb=short",
+        "Systems Tests",
     )
 
 
@@ -169,9 +169,7 @@ def main():
     parser.add_argument(
         "--integration", action="store_true", help="Run integration tests only"
     )
-    parser.add_argument(
-        "--enhanced", action="store_true", help="Run enhanced system tests only"
-    )
+    parser.add_argument("--systems", action="store_true", help="Run system tests only")
     parser.add_argument(
         "--coverage", action="store_true", help="Run tests with coverage"
     )
@@ -205,23 +203,23 @@ def main():
         results.append(run_unit_tests())
     elif args.integration:
         results.append(run_integration_tests())
-    elif args.enhanced:
-        results.append(run_enhanced_system_tests())
+    elif args.systems:
+        results.append(run_system_tests())
     elif args.coverage:
         results.append(run_tests_with_coverage())
     elif args.lint:
         results.append(run_linting())
     elif args.all:
         results.append(run_system_verification())
-        results.append(run_enhanced_system_tests())
+        results.append(run_system_tests())
         results.append(run_unit_tests())
         results.append(run_integration_tests())
         results.append(run_linting())
         results.append(run_tests_with_coverage())
     else:
-        # Default: run enhanced tests and verification
+        # Default: run system tests and verification
         results.append(run_system_verification())
-        results.append(run_enhanced_system_tests())
+        results.append(run_system_tests())
         if not args.fast:
             results.append(run_unit_tests())
 

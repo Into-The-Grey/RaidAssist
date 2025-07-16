@@ -3,8 +3,8 @@
 #
 # Enhanced test_bungie.py with improved error handling and logging integration
 
-import os
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -37,16 +37,16 @@ except ImportError:
 
 # Enhanced error handling for tests
 try:
-    from utils.logging_manager import get_logger
     from utils.error_handler import safe_execute
+    from utils.logging_manager import get_logger
 
     test_logger = get_logger("raidassist.tests.bungie")
-    ENHANCED_TESTING = True
+    TESTING = True
 except ImportError:
     import logging
 
     test_logger = logging.getLogger("tests.bungie")
-    ENHANCED_TESTING = False
+    TESTING = False
 
     def safe_execute(func, *args, **kwargs):
         try:
@@ -77,10 +77,10 @@ class TestBungieAPI:
         result = safe_execute(bungie.load_token, default_return=None)
         assert result == "xyz789"
 
-        if ENHANCED_TESTING:
+        if TESTING:
             test_logger.info("Token loading test passed")
 
-        if ENHANCED_TESTING:
+        if TESTING:
             test_logger.info("Token loading test passed")
 
     def _manual_test_load_token(self):
@@ -149,7 +149,7 @@ class TestBungieAPI:
         result = safe_execute(bungie.test_api_connection, default_return=False)
         assert isinstance(result, bool)
 
-        if ENHANCED_TESTING:
+        if TESTING:
             test_logger.info(f"API connection test result: {result}")
 
     def test_ensure_authenticated_functionality(self):
@@ -158,7 +158,7 @@ class TestBungieAPI:
         result = safe_execute(bungie.ensure_authenticated, default_return=False)
         assert isinstance(result, bool)
 
-        if ENHANCED_TESTING:
+        if TESTING:
             test_logger.info(f"Authentication check result: {result}")
 
 

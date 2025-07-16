@@ -1,6 +1,6 @@
 # RaidAssist Enhanced - Python Dependencies
 # Core GUI and application framework
-PySide2>=5.15.2
+PySide6>=6.0.0
 
 # Enhanced features
 keybind>=0.3.0

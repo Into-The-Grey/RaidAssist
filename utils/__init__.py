@@ -14,25 +14,16 @@ __author__ = "Nicholas Acord"
 
 # Enhanced utility imports
 try:
-    from .logging_manager import (
-        get_logger,
-        log_context,
-        logger_manager,
-        RaidAssistLogger,
-    )
+    from .logging_manager import (RaidAssistLogger, get_logger, log_context,
+                                  logger_manager)
 
     LOGGING_AVAILABLE = True
 except ImportError:
     LOGGING_AVAILABLE = False
 
 try:
-    from .error_handler import (
-        safe_execute,
-        handle_exception,
-        error_handler,
-        ErrorHandler,
-        ErrorSeverity,
-    )
+    from .error_handler import (ErrorHandler, ErrorSeverity, error_handler,
+                                handle_exception, safe_execute)
 
     ERROR_HANDLING_AVAILABLE = True
 except ImportError:
@@ -70,12 +61,12 @@ def get_utils_status():
 
 
 # Convenience function for initialization
-def initialize_enhanced_systems():
-    """Initialize enhanced logging and error handling systems."""
+def initialize_systems():
+    """Initialize logging and error handling systems."""
     if LOGGING_AVAILABLE:
         # Logging initializes automatically via singleton
         logger = get_logger("raidassist.utils")
-        logger.info("Enhanced utils module initialized")
+        logger.info("Utils module initialized")
 
         if ERROR_HANDLING_AVAILABLE:
             logger.info("Full enhancement suite available")
@@ -84,5 +75,5 @@ def initialize_enhanced_systems():
             logger.warning("Error handling not available")
             return False
     else:
-        print("Enhanced logging not available")
+        print("Logging not available")
         return False

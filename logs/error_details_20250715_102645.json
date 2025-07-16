@@ -1,0 +1,33 @@
+[
+  {
+    "timestamp": "2025-07-15T10:29:47.226975",
+    "session_id": "20250715_102645",
+    "level": "ERROR",
+    "message": "Exception in context 'oauth_flow'",
+    "exception_type": "TimeoutError",
+    "exception_message": "OAuth flow timed out after 180 seconds. Please try again or check your browser.",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ncacord/RaidAssist/auth_server.py\", line 210, in get_auth_code\n    raise TimeoutError(\n    ...<2 lines>...\n    )\nTimeoutError: OAuth flow timed out after 180 seconds. Please try again or check your browser.\n",
+    "context_stack": [
+      "authentication_check",
+      "token_loading",
+      "oauth_flow",
+      "oauth_flow"
+    ],
+    "extra": {}
+  },
+  {
+    "timestamp": "2025-07-15T10:29:47.228346",
+    "session_id": "20250715_102645",
+    "level": "ERROR",
+    "message": "Exception in context 'oauth_flow'",
+    "exception_type": "TimeoutError",
+    "exception_message": "OAuth flow timed out after 180 seconds. Please try again or check your browser.",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ncacord/RaidAssist/api/bungie.py\", line 137, in prompt_for_oauth_token\n    code = get_auth_code(auth_url, ssl_context=ssl_ctx)\n  File \"/home/ncacord/RaidAssist/auth_server.py\", line 210, in get_auth_code\n    raise TimeoutError(\n    ...<2 lines>...\n    )\nTimeoutError: OAuth flow timed out after 180 seconds. Please try again or check your browser.\n",
+    "context_stack": [
+      "authentication_check",
+      "token_loading",
+      "oauth_flow"
+    ],
+    "extra": {}
+  }
+]

@@ -30,26 +30,26 @@ This now launches the complete enhanced GUI application with:
 For CLI-only usage, use the individual API modules directly.
 """
 
-import sys
 import os
+import sys
 
 # Enhanced error handling
 try:
     from utils.logging_manager import get_logger
 
     logger = get_logger("raidassist.main")
-    ENHANCED_LOGGING = True
+    LOGGING = True
 except ImportError:
     import logging
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("raidassist.main")
-    ENHANCED_LOGGING = False
+    LOGGING = False
 
 # GUI imports
 try:
-    from PySide2.QtWidgets import QApplication, QMessageBox # type: ignore
-    from PySide2.QtCore import Qt # type: ignore
+    from PySide6.QtCore import Qt  # type: ignore
+    from PySide6.QtWidgets import QApplication, QMessageBox  # type: ignore
 
     GUI_AVAILABLE = True
 except ImportError:
@@ -60,7 +60,7 @@ def ensure_gui_dependencies():
     """Ensure GUI dependencies are available."""
     if not GUI_AVAILABLE:
         print("❌ GUI dependencies not available!")
-        print("Please install PySide2: pip install PySide2")
+        print("Please install PySide6: pip install PySide6")
         return False
     return True
 
@@ -68,12 +68,12 @@ def ensure_gui_dependencies():
 def launch_ui():
     """Launch the UI application."""
     try:
-        from ui.interface import RaidAssistUI
         from ui import UI_AVAILABLE
+        from ui.interface import RaidAssistUI
 
         if not UI_AVAILABLE:
-            logger.error("UI not available - Qt/PySide2 not installed")
-            print("❌ No UI available - Qt/PySide2 not installed")
+            logger.error("UI not available - Qt/PySide6 not installed")
+            print("❌ No UI available - Qt/PySide6 not installed")
             return 1
 
         # Create application

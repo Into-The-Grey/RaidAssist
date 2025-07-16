@@ -1,8 +1,9 @@
-import os
 import json
-import requests
+import os
 import time
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+import requests
 
 # Load .env variables if present
 try:
@@ -15,8 +16,10 @@ except ImportError:
 # Fallback implementations first
 import logging
 
+
 def _get_logger_fallback(name):
     return logging.getLogger(name)
+
 
 def _log_context_fallback(context: str):
     class DummyContext:
@@ -29,6 +32,7 @@ def _log_context_fallback(context: str):
 
     return DummyContext()
 
+
 def _safe_execute_fallback(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
@@ -37,19 +41,20 @@ def _safe_execute_fallback(func, *args, **kwargs):
         print(f"Safe execute failed: {e}")
         return kwargs.get("default_return")
 
+
 # Try to import enhanced utils, fall back to basic implementations
 try:
-    from utils.logging_manager import get_logger, log_context
     from utils.error_handler import safe_execute
+    from utils.logging_manager import get_logger, log_context
 
-    ENHANCED_UTILS_AVAILABLE = True
+    UTILS_AVAILABLE = True
 except ImportError:
     # Use fallback implementations
     get_logger = _get_logger_fallback
     log_context = _log_context_fallback
     safe_execute = _safe_execute_fallback
-    
-    ENHANCED_UTILS_AVAILABLE = False
+
+    UTILS_AVAILABLE = False
 
 
 # Define constants

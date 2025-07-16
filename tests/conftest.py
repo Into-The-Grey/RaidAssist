@@ -8,10 +8,11 @@ Provides shared fixtures and configuration for all tests.
 
 import os
 import sys
-import pytest
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
+
+import pytest
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
@@ -33,16 +34,16 @@ def temp_logs_dir(tmp_path):
 
 
 @pytest.fixture
-def mock_enhanced_logging():
-    """Mock enhanced logging system for tests that don't need real logging."""
+def mock_logging():
+    """Mock logging system for tests that don't need real logging."""
     with patch("utils.logging_manager.get_logger") as mock_logger:
         mock_logger.return_value = Mock()
         yield mock_logger
 
 
 @pytest.fixture
-def mock_enhanced_error_handler():
-    """Mock enhanced error handling for tests."""
+def mock_error_handler():
+    """Mock error handling for tests."""
     with patch("utils.error_handler.safe_execute") as mock_safe_execute:
         mock_safe_execute.side_effect = lambda func, *args, **kwargs: func(
             *args, **kwargs
@@ -111,10 +112,10 @@ def disable_qt():
     with patch.dict(
         "sys.modules",
         {
-            "PySide2": Mock(),
-            "PySide2.QtWidgets": Mock(),
-            "PySide2.QtCore": Mock(),
-            "PySide2.QtGui": Mock(),
+            "PySide6": Mock(),
+            "PySide6.QtWidgets": Mock(),
+            "PySide6.QtCore": Mock(),
+            "PySide6.QtGui": Mock(),
         },
     ):
         yield
@@ -165,18 +166,18 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "slow: Slow running tests")
 
 
-# Skip GUI tests if PySide2 not available
+# Skip GUI tests if PySide6 not available
 def pytest_collection_modifyitems(config, items):
-    """Modify test collection to skip GUI tests if PySide2 unavailable."""
+    """Modify test collection to skip GUI tests if PySide6 unavailable."""
     try:
-        import PySide2
+        import PySide6
 
         pyside_available = True
     except ImportError:
         pyside_available = False
 
     if not pyside_available:
-        skip_gui = pytest.mark.skip(reason="PySide2 not available")
+        skip_gui = pytest.mark.skip(reason="PySide6 not available")
         for item in items:
             if "gui" in item.keywords:
                 item.add_marker(skip_gui)

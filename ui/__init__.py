@@ -16,7 +16,7 @@ __author__ = "Nicholas Acord"
 # Check for Qt availability
 QT_AVAILABLE = False
 try:
-    import PySide2
+    import PySide6
 
     QT_AVAILABLE = True
 except ImportError:
@@ -28,23 +28,19 @@ OVERLAY_AVAILABLE = False
 
 if QT_AVAILABLE:
     try:
-        from .interface import RaidAssistUI
-        from .settings import SettingsDialog
-        from .loading import LoadingDialog
         from .api_tester import ApiTesterDialog
+        from .interface import RaidAssistUI
+        from .loading import LoadingDialog
+        from .settings import SettingsDialog
 
         UI_AVAILABLE = True
     except ImportError:
         pass
 
     try:
-        from .overlay import AdvancedOverlay, create_advanced_overlay
+        from .overlay import Overlay, create_overlay
 
         OVERLAY_AVAILABLE = True
-    except ImportError:
-        pass
-
-        STANDARD_UI_AVAILABLE = True
     except ImportError:
         pass
 
@@ -67,7 +63,7 @@ if UI_AVAILABLE:
     )
 
 if OVERLAY_AVAILABLE:
-    __all__.extend(["AdvancedOverlay", "create_advanced_overlay"])
+    __all__.extend(["Overlay", "create_overlay"])
 
 
 # Version info

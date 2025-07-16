@@ -11,7 +11,7 @@ authors = [
 ]
 license = { text = "GPL-3.0-only" }
 dependencies = [
-    "PySide2>=5.15.0",
+    "PySide6>=6.0.0",
     "requests>=2.25.0",
     "python-dotenv>=1.0.0",
     "keybind"

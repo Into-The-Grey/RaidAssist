@@ -26,10 +26,11 @@ manifest.py — Download, cache, and load the Destiny 2 manifest for item lookup
 """
 
 
-import os
-import requests
 import json
 import logging
+import os
+
+import requests
 
 
 def get_project_root():

@@ -17,13 +17,19 @@ jobs:
       BUNGIE_CLIENT_ID: ${{ secrets.BUNGIE_CLIENT_ID }}
       BUNGIE_CLIENT_SECRET: ${{ secrets.BUNGIE_CLIENT_SECRET }}
       BUNGIE_REDIRECT_URI: ${{ secrets.BUNGIE_REDIRECT_URI }}
+      QT_QPA_PLATFORM: offscreen  # Enable headless Qt for CI
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'  # Use Python 3.8 for compatibility
+          python-version: '3.13'  # Use Python 3.13 for PySide6 compatibility
+
+      - name: Install system dependencies for GUI testing
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
 
       - name: Install dependencies
         run: |
@@ -38,13 +44,13 @@ jobs:
       - name: Create logs directory
         run: mkdir -p logs
 
-      - name: Run enhanced system tests
+      - name: Run system tests
         run: |
-          python -m pytest tests/test_enhanced_systems.py -v --tb=short -m "not gui" || echo "Enhanced tests completed"
+          python -m pytest tests/test_systems.py -v --tb=short -m "not gui" || echo "System tests completed"
 
       - name: Run unit tests
         run: |
-          python -m pytest tests/ -v --tb=short -m "not slow and not integration and not gui" --ignore=tests/test_enhanced_systems.py
+          python -m pytest tests/ -v --tb=short -m "not slow and not integration and not gui" --ignore=tests/test_systems.py
 
       - name: Run integration tests
         run: |

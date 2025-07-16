@@ -7,39 +7,30 @@ error_handler.py — Robust error handling and recovery system for RaidAssist.
 Provides centralized error handling, user-friendly error messages, and automatic recovery.
 """
 
-import sys
-import traceback
-from typing import Optional, Dict, Any, Callable, List, TYPE_CHECKING
-from dataclasses import dataclass
-from enum import Enum
-from datetime import datetime
 import json
 import os
+import sys
+import traceback
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
-from utils.logging_manager import logger_manager, log_context
+from utils.logging_manager import log_context, logger_manager
 
 # Module-level Qt availability check
 try:
-    import PyQt5.QtWidgets
-    import PyQt5.QtCore
+    import PySide6.QtCore  # type: ignore
+    import PySide6.QtWidgets  # type: ignore
 
     QT_AVAILABLE = True
 except ImportError:
-    try:
-        import PySide2.QtWidgets  # type: ignore
-        import PySide2.QtCore  # type: ignore
-
-        QT_AVAILABLE = True
-    except ImportError:
-        QT_AVAILABLE = False
+    QT_AVAILABLE = False
 
 try:
-    from PyQt5.QtWidgets import QWidget
+    from PySide6.QtWidgets import QWidget  # type: ignore
 except ImportError:
-    try:
-        from PySide2.QtWidgets import QWidget  # type: ignore
-    except ImportError:
-        QWidget = None
+    QWidget = None
 
 
 class ErrorSeverity(Enum):
@@ -424,10 +415,7 @@ class ErrorHandler:
 
         # Import Qt classes dynamically when needed
         try:
-            try:
-                from PyQt5.QtWidgets import QMessageBox
-            except ImportError:
-                from PySide2.QtWidgets import QMessageBox  # type: ignore
+            from PySide6.QtWidgets import QMessageBox  # type: ignore
         except ImportError:
             # Qt not available, fallback to console
             print(f"Error: {error_info.user_message}")
@@ -435,13 +423,13 @@ class ErrorHandler:
 
         # Determine dialog type based on severity
         if error_info.severity == ErrorSeverity.CRITICAL:
-            icon = QMessageBox.Critical
+            icon = QMessageBox.Icon.Critical
             title = "Critical Error"
         elif error_info.severity == ErrorSeverity.HIGH:
-            icon = QMessageBox.Warning
+            icon = QMessageBox.Icon.Warning
             title = "Error"
         else:
-            icon = QMessageBox.Information
+            icon = QMessageBox.Icon.Information
             title = "Notice"
 
         # Create detailed message

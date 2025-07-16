@@ -4,12 +4,22 @@ settings.py — Settings dialog and config loader for RaidAssist.
 Stores and loads app preferences in JSON.
 """
 
-from PySide2.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QPushButton, QGroupBox, QFrame  # type: ignore
-from PySide2.QtCore import Qt  # type: ignore
-from PySide2.QtGui import QIcon, QFont  # type: ignore
 import json
-import os
 import logging
+import os
+
+from PySide6.QtCore import Qt  # type: ignore
+from PySide6.QtGui import QFont, QIcon  # type: ignore
+from PySide6.QtWidgets import (
+    QDialog,
+    QFrame,
+    QGroupBox,  # type: ignore
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QSpinBox,
+    QVBoxLayout,
+)
 
 
 def get_project_root():
@@ -83,9 +93,9 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Settings")
         self.setMinimumSize(400, 300)
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(20)
-        self.layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
 
         # Hero area
         self.create_hero_area()
@@ -96,7 +106,7 @@ class SettingsDialog(QDialog):
         # Button area
         self.create_button_area()
 
-        self.setLayout(self.layout)
+        self.setLayout(self.main_layout)
 
         self.settings = load_settings()
         self.interval_spin.setValue(self.settings.get("refresh_interval_seconds", 60))
@@ -104,7 +114,7 @@ class SettingsDialog(QDialog):
     def create_hero_area(self):
         """Creates the hero area with welcome message and icon."""
         hero_frame = QFrame()
-        hero_frame.setFrameStyle(QFrame.StyledPanel)
+        hero_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         hero_frame.setStyleSheet(
             "QFrame { background-color: #f0f0f0; border-radius: 8px; padding: 15px; }"
         )
@@ -120,7 +130,7 @@ class SettingsDialog(QDialog):
         else:
             icon_label.setText("⚙️")
             icon_label.setStyleSheet("font-size: 32px;")
-        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Welcome text
         welcome_label = QLabel("Application Settings")
@@ -128,14 +138,14 @@ class SettingsDialog(QDialog):
         welcome_font.setPointSize(16)
         welcome_font.setBold(True)
         welcome_label.setFont(welcome_font)
-        welcome_label.setAlignment(Qt.AlignVCenter)
+        welcome_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         hero_layout.addWidget(icon_label)
         hero_layout.addWidget(welcome_label)
         hero_layout.addStretch()
 
         hero_frame.setLayout(hero_layout)
-        self.layout.addWidget(hero_frame)
+        self.main_layout.addWidget(hero_frame)
 
     def create_settings_card(self):
         """Creates the settings form as a card."""
@@ -179,7 +189,7 @@ class SettingsDialog(QDialog):
         settings_layout.addWidget(interval_frame)
 
         settings_group.setLayout(settings_layout)
-        self.layout.addWidget(settings_group)
+        self.main_layout.addWidget(settings_group)
 
     def create_button_area(self):
         """Creates the button area with icons."""
@@ -216,8 +226,8 @@ class SettingsDialog(QDialog):
         button_layout.addWidget(cancel_button)
         button_layout.addWidget(self.save_button)
 
-        self.layout.addWidget(QFrame())  # Spacer
-        self.layout.addLayout(button_layout)
+        self.main_layout.addWidget(QFrame())  # Spacer
+        self.main_layout.addLayout(button_layout)
 
     def save_and_close(self):
         """

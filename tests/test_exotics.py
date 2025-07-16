@@ -1,8 +1,10 @@
-import os
 import json
-import pytest # type: ignore
+import os
 
-from api.exotics import load_exotic_cache, build_exotic_cache, is_exotic, all_exotics
+import pytest  # type: ignore
+
+from api.exotics import (all_exotics, build_exotic_cache, is_exotic,
+                         load_exotic_cache)
 
 
 def test_exotics_cache_roundtrip(tmp_path, monkeypatch):
@@ -11,6 +13,7 @@ def test_exotics_cache_roundtrip(tmp_path, monkeypatch):
     # Patch get_cache_path to use a temp location for this test only
     def temp_cache_path():
         return str(tmp_path / "exotics_cache.json")
+
     monkeypatch.setattr(exotics_mod, "get_cache_path", temp_cache_path)
 
     # Build and load cache

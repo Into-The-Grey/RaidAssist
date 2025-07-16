@@ -3,10 +3,10 @@
 #
 # Enhanced auth_server.py with improved logging and error handling
 
+import html
 import os
 import threading
 import webbrowser
-import html
 
 # Flask imports with fallback
 try:
@@ -23,7 +23,7 @@ try:
     from utils.logging_manager import get_logger, log_context
 
     logger = get_logger("raidassist.auth")
-    ENHANCED_LOGGING = True
+    LOGGING = True
 except ImportError:
     import logging
 
@@ -35,7 +35,7 @@ except ImportError:
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
     logger = logging.getLogger("auth_server")
-    ENHANCED_LOGGING = False
+    LOGGING = False
 
 # Only define Flask app and routes when Flask is available
 if FLASK_AVAILABLE:
@@ -46,7 +46,7 @@ if FLASK_AVAILABLE:
     def callback():
         """Handle OAuth callback from Bungie API."""
         try:
-            if ENHANCED_LOGGING:
+            if LOGGING:
                 from contextlib import nullcontext
 
                 context_manager = log_context("oauth_callback")
@@ -100,7 +100,7 @@ else:
     # Fallback implementations when Flask is not available
     received_code = {}
 
-    class nullcontext: # type: ignore
+    class nullcontext:  # type: ignore
         """Fallback context manager when enhanced logging not available."""
 
         def __enter__(self):
@@ -117,7 +117,7 @@ else:
             logger.warning("SSL context provided but Flask not available")
         received_code["error"] = "Flask not installed"
 
-    def get_auth_code(auth_url, ssl_context=None, timeout=180): # type: ignore
+    def get_auth_code(auth_url, ssl_context=None, timeout=180):  # type: ignore
         """Fallback auth code getter - not functional without Flask."""
         logger.error(f"Cannot get auth code for {auth_url} - Flask not available")
         if ssl_context:  # Use parameter to avoid lint warning
@@ -130,7 +130,7 @@ else:
 
 
 # Also define nullcontext for when Flask is available but enhanced logging is not
-if FLASK_AVAILABLE and not ENHANCED_LOGGING:
+if FLASK_AVAILABLE and not LOGGING:
 
     class nullcontext:
         """Fallback context manager when enhanced logging not available."""
@@ -149,11 +149,7 @@ if FLASK_AVAILABLE:
     def run_auth_server(ssl_context=None):
         """Run the authentication server with enhanced error handling."""
         try:
-            with (
-                log_context("auth_server_startup")
-                if ENHANCED_LOGGING
-                else nullcontext()
-            ):
+            with log_context("auth_server_startup") if LOGGING else nullcontext():
                 logger.info("Starting authentication server on localhost:7777")
                 app.run(host="localhost", port=7777, ssl_context=ssl_context)
         except OSError as e:
@@ -176,7 +172,7 @@ if FLASK_AVAILABLE:
             TimeoutError: If OAuth flow times out
             RuntimeError: If authentication fails
         """
-        with log_context("oauth_flow") if ENHANCED_LOGGING else nullcontext():
+        with log_context("oauth_flow") if LOGGING else nullcontext():
             # Clear any previous state
             received_code.clear()
 

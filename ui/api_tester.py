@@ -4,27 +4,28 @@ api_tester.py — Bungie API call tester dialog for RaidAssist.
 Allows power users to send requests to any Bungie API endpoint and view/save the response.
 """
 
-from PySide2.QtWidgets import (  # type: ignore
-    QDialog,
-    QVBoxLayout,
+import json
+import logging
+import os
+
+import requests
+from PySide6.QtCore import Qt  # type: ignore
+from PySide6.QtGui import QFont, QIcon  # type: ignore
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,  # type: ignore
+    QFileDialog,
+    QFrame,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
-    QTextEdit,
-    QFileDialog,
-    QGroupBox,
-    QFrame,
-    QSpacerItem,
     QSizePolicy,
-    QApplication,
+    QSpacerItem,
+    QTextEdit,
+    QVBoxLayout,
 )
-from PySide2.QtCore import Qt  # type: ignore
-from PySide2.QtGui import QIcon, QFont  # type: ignore
-import requests
-import json
-import os
-import logging
 
 try:
     from dotenv import load_dotenv  # type: ignore
@@ -97,17 +98,16 @@ class ApiTesterDialog(QDialog):
         super().__init__(parent)
 
         app = QApplication.instance()
+        # Note: load_qss function not available, using default Qt styling
         if app:
-            from ui.interface import load_qss
-
-            load_qss(app)
+            pass  # Could apply custom styling here if needed
 
         self.setWindowTitle("Bungie API Tester")
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(16)
-        self.layout.setContentsMargins(20, 20, 20, 20)
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setSpacing(16)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
 
         # Hero area
         self.create_hero_area()
@@ -121,7 +121,7 @@ class ApiTesterDialog(QDialog):
         # Action buttons
         self.create_action_buttons()
 
-        self.setLayout(self.layout)
+        self.setLayout(self.main_layout)
 
         self.send_button.clicked.connect(self.make_request)
         self.save_button.clicked.connect(self.save_result)
@@ -148,7 +148,7 @@ class ApiTesterDialog(QDialog):
         hero_layout.addStretch()
         hero_layout.addWidget(auth_status)
 
-        self.layout.addWidget(hero_frame)
+        self.main_layout.addWidget(hero_frame)
 
     def create_request_card(self):
         """Create the request input card."""
@@ -177,7 +177,7 @@ class ApiTesterDialog(QDialog):
 
         request_layout.addLayout(endpoint_row)
         request_group.setLayout(request_layout)
-        self.layout.addWidget(request_group)
+        self.main_layout.addWidget(request_group)
 
     def create_results_card(self):
         """Create the results display card."""
@@ -203,7 +203,7 @@ class ApiTesterDialog(QDialog):
 
         results_layout.addWidget(self.result_view)
         results_group.setLayout(results_layout)
-        self.layout.addWidget(results_group, 1)  # Allow to expand
+        self.main_layout.addWidget(results_group, 1)  # Allow to expand
 
     def create_action_buttons(self):
         """Create the action buttons area."""
@@ -211,7 +211,9 @@ class ApiTesterDialog(QDialog):
         actions_layout = QHBoxLayout(actions_frame)
 
         # Add spacer to push buttons to the right
-        spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        spacer = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
         actions_layout.addItem(spacer)
 
         self.save_button = QPushButton("Save Result")
@@ -222,7 +224,7 @@ class ApiTesterDialog(QDialog):
             self.save_button.setText("💾 Save Result")
 
         actions_layout.addWidget(self.save_button)
-        self.layout.addWidget(actions_frame)
+        self.main_layout.addWidget(actions_frame)
 
     def make_request(self):
         """

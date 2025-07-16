@@ -3,8 +3,9 @@ parse_profile.py — Extracts red border, catalyst, and exotic data from Bungie 
 """
 
 import json
-import os
 import logging
+import os
+
 from api.exotics import all_exotics  # Manifest-driven exotic lookup
 
 

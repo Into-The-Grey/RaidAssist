@@ -2,10 +2,17 @@
 loading.py — Simple loading modal dialog for RaidAssist.
 """
 
-from PySide2.QtWidgets import QDialog, QVBoxLayout, QLabel, QFrame, QHBoxLayout  # type: ignore
-from PySide2.QtCore import Qt  # type: ignore
-from PySide2.QtGui import QIcon, QPixmap  # type: ignore
 import os
+
+from PySide6.QtCore import Qt  # type: ignore
+from PySide6.QtGui import QIcon, QPixmap  # type: ignore
+from PySide6.QtWidgets import (
+    QDialog,
+    QFrame,
+    QHBoxLayout,  # type: ignore
+    QLabel,
+    QVBoxLayout,
+)
 
 
 def get_asset_path(filename):
@@ -22,7 +29,9 @@ class LoadingDialog(QDialog):
         super().__init__(parent)
         self.setModal(True)
         self.setWindowTitle("Please Wait")
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(
+            self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint
+        )
 
         # Main layout
         main_layout = QVBoxLayout()
@@ -30,7 +39,7 @@ class LoadingDialog(QDialog):
 
         # Card frame for modern look
         card_frame = QFrame()
-        card_frame.setFrameStyle(QFrame.Box)
+        card_frame.setFrameStyle(QFrame.Shape.Box)
         card_frame.setStyleSheet(
             """
             QFrame {
@@ -59,12 +68,14 @@ class LoadingDialog(QDialog):
             # Fallback text if icon not found
             icon_label.setText("⏳")
             icon_label.setStyleSheet("font-size: 24px;")
-        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Message label
         message_label = QLabel(message)
         message_label.setStyleSheet("font-size: 14px; color: #333;")
-        message_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        message_label.setAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
 
         content_layout.addWidget(icon_label)
         content_layout.addWidget(message_label)

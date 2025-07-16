@@ -2,7 +2,7 @@
 # Copyright (C) 2025 Nicholas Acord <ncacord@protonmail.com>
 
 """
-advanced_overlay.py — Modern, customizable overlay system for RaidAssist.
+overlay.py — Modern, customizable overlay system for RaidAssist.
 
 Features:
 - Multiple overlay widgets (progress bars, charts, notifications)
@@ -13,72 +13,72 @@ Features:
 - Performance optimized for gaming
 """
 
-import sys
 import json
-import os
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict, field
-from enum import Enum
 import math
+import os
+import sys
 import time
+from dataclasses import asdict, dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 # Qt imports with proper error handling
 QT_AVAILABLE = False
 try:
-    from PySide2.QtWidgets import ( # type: ignore
-        QWidget,
-        QVBoxLayout,
-        QHBoxLayout,
-        QLabel,
-        QPushButton,
-        QSlider,
-        QFrame,
-        QGraphicsEffect,
-        QGraphicsDropShadowEffect,
-        QGridLayout,
-        QScrollArea,
-        QCheckBox,
-        QComboBox,
-        QSpinBox,
-        QGroupBox,
-        QProgressBar,
-        QApplication,
-        QSystemTrayIcon,
-        QMenu,
-        QAction,
-        QColorDialog,
-        QFontDialog,
-        QSizePolicy,
-        QStackedWidget,
-    )
-    from PySide2.QtCore import ( # type: ignore
-        Qt,
-        QTimer,
-        QPropertyAnimation,
+    from PySide6.QtCore import (
         QEasingCurve,
-        QRect,
-        QPoint,
-        QSize,
-        Signal,
-        QThread,
         QMutex,
-        QObject,
+        QObject,  # type: ignore
+        QPoint,
+        QPropertyAnimation,
+        QRect,
+        QSize,
+        Qt,
+        QThread,
+        QTimer,
+        Signal,
         Slot,
     )
-    from PySide2.QtGui import ( # type: ignore
-        QPainter,
-        QColor,
-        QFont,
-        QPixmap,
-        QIcon,
-        QPen,
+    from PySide6.QtGui import (
         QBrush,
-        QLinearGradient,
-        QRadialGradient,
-        QPainterPath,
+        QColor,
+        QFont,  # type: ignore
         QFontMetrics,
+        QIcon,
+        QLinearGradient,
         QMouseEvent,
+        QPainter,
+        QPainterPath,
         QPaintEvent,
+        QPen,
+        QPixmap,
+        QRadialGradient,
+        QAction,
+    )
+    from PySide6.QtWidgets import (
+        QApplication,  # type: ignore
+        QCheckBox,
+        QColorDialog,
+        QComboBox,
+        QFontDialog,
+        QFrame,
+        QGraphicsDropShadowEffect,
+        QGraphicsEffect,
+        QGridLayout,
+        QGroupBox,
+        QHBoxLayout,
+        QLabel,
+        QMenu,
+        QProgressBar,
+        QPushButton,
+        QScrollArea,
+        QSizePolicy,
+        QSlider,
+        QSpinBox,
+        QStackedWidget,
+        QSystemTrayIcon,
+        QVBoxLayout,
+        QWidget,
     )
 
     QT_AVAILABLE = True
@@ -86,9 +86,10 @@ except ImportError:
     # Create placeholder classes when Qt is not available
     pass
 
+from utils.error_handler import safe_execute
+
 # Always import these for type definitions
 from utils.logging_manager import get_logger, log_context
-from utils.error_handler import safe_execute, handle_exception
 
 
 class OverlayDisplayMode(Enum):
@@ -200,7 +201,7 @@ if QT_AVAILABLE:
             self.data = {}
 
             self.setMinimumSize(200, 40)
-            self.setAttribute(Qt.WA_TranslucentBackground)
+            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
             # Setup styling
             self._setup_styling()
@@ -228,7 +229,7 @@ if QT_AVAILABLE:
             """Setup animations for the widget."""
             self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
             self.fade_animation.setDuration(self.config.fade_duration)
-            self.fade_animation.setEasingCurve(QEasingCurve.InOutQuad)
+            self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
 
         def fade_in(self):
             """Animate widget fade in."""
@@ -271,7 +272,7 @@ if QT_AVAILABLE:
 
             # Title
             self.title_label = QLabel("Progress Overview")
-            self.title_label.setAlignment(Qt.AlignCenter)
+            self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.title_label.setStyleSheet("font-weight: bold; font-size: 12px;")
             layout.addWidget(self.title_label)
 
@@ -365,14 +366,14 @@ if QT_AVAILABLE:
             animation.setDuration(500)
             animation.setStartValue(current_value)
             animation.setEndValue(target_value)
-            animation.setEasingCurve(QEasingCurve.OutCubic)
+            animation.setEasingCurve(QEasingCurve.Type.OutCubic)
 
             # Store animation to prevent garbage collection
-            progress_bar._animation = animation
+            progress_bar._animation = animation  # type: ignore[misc]
             animation.start()
 
-    class AdvancedOverlay(QWidget): # type: ignore
-        """Main advanced overlay window with multiple widgets."""
+    class Overlay(QWidget):  # type: ignore
+        """Main overlay window with multiple widgets."""
 
         # Signals for communication
         data_updated = Signal(dict)
@@ -396,7 +397,7 @@ if QT_AVAILABLE:
             # Setup timers for auto-refresh
             self._setup_timers()
 
-            self.logger.info("Advanced overlay initialized")
+            self.logger.info("Overlay initialized")
 
         def _setup_window(self):
             """Setup window properties and behavior."""
@@ -406,13 +407,15 @@ if QT_AVAILABLE:
             )
 
             # Window flags for overlay behavior
-            flags = Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+            flags = (
+                Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
+            )
             if self.config.frameless:
-                flags |= Qt.Tool
+                flags |= Qt.WindowType.Tool
             self.setWindowFlags(flags)
 
             # Transparency and styling
-            self.setAttribute(Qt.WA_TranslucentBackground)
+            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
             self.setWindowOpacity(self.config.opacity)
 
             # Apply theme styling
@@ -524,7 +527,7 @@ if QT_AVAILABLE:
 
         def mousePressEvent(self, event: QMouseEvent):
             """Handle mouse press for dragging."""
-            if self.config.draggable and event.button() == Qt.LeftButton:
+            if self.config.draggable and event.button() == Qt.MouseButton.LeftButton:
                 self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
                 event.accept()
 
@@ -532,7 +535,7 @@ if QT_AVAILABLE:
             """Handle mouse move for dragging."""
             if (
                 self.config.draggable
-                and event.buttons() == Qt.LeftButton
+                and event.buttons() == Qt.MouseButton.LeftButton
                 and hasattr(self, "drag_position")
             ):
                 self.move(event.globalPos() - self.drag_position)
@@ -540,7 +543,7 @@ if QT_AVAILABLE:
 
 else:
     # Fallback classes when Qt is not available
-    class AdvancedOverlay:
+    class Overlay:
         """Fallback overlay class when Qt is not available."""
 
         def __init__(self, config=None):
@@ -557,13 +560,14 @@ else:
             pass
 
 
-def create_advanced_overlay(config: Optional[OverlayConfig] = None) -> AdvancedOverlay:
-    """Create and return an advanced overlay instance."""
+def create_overlay(config: Optional[OverlayConfig] = None) -> Optional[Overlay]:
+    """Create and return an overlay instance."""
     if not QT_AVAILABLE:
         logger = get_logger("raidassist.overlay")
-        logger.warning("Creating fallback overlay - Qt not available")
+        logger.warning("Cannot create overlay - Qt not available")
+        return None
 
-    return AdvancedOverlay(config)
+    return Overlay(config)
 
 
 def load_overlay_config(config_path: str) -> OverlayConfig:

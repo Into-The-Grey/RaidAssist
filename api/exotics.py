@@ -8,13 +8,19 @@ exotics.py — Dynamic Destiny 2 exotic item filter, using the game manifest.
 Relies on the manifest (see api/manifest.py).
 """
 
-import os
 import json
+import os
+
 from api.manifest import load_item_definitions
 
 
 def get_cache_path():
-    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "RaidAssist", "cache", "exotics_cache.json")
+    return os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "RaidAssist",
+        "cache",
+        "exotics_cache.json",
+    )
 
 
 def build_exotic_cache():
@@ -59,7 +65,9 @@ def load_exotic_cache():
     """
     if os.path.exists(get_cache_path()):
         with open(get_cache_path(), "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Convert string keys back to integers to match build_exotic_cache format
+            return {int(k): v for k, v in data.items()}
     return build_exotic_cache()
 
 

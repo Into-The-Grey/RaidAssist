@@ -7,14 +7,15 @@ oauth.py — Bungie OAuth handler for RaidAssist.
 - Handles automatic token refresh (if expired)
 """
 
-import os
 import json
-import threading
-import requests
 import logging
+import os
+import threading
 import webbrowser
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs, urlparse
+
+import requests
 
 # ==== CONFIGURATION ====
 CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "YOUR_CLIENT_ID")

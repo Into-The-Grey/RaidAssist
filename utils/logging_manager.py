@@ -12,15 +12,15 @@ logging_manager.py — Centralized logging system for RaidAssist.
 Provides unified logging with proper formatting, rotation, and error tracking.
 """
 
+import json
 import logging
 import logging.handlers
 import os
 import sys
 import traceback
 from datetime import datetime
-from typing import Optional, Any
 from enum import Enum
-import json
+from typing import Any, Optional
 
 
 class LogLevel(Enum):

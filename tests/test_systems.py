@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# RaidAssist Enhanced - Comprehensive Enhanced Systems Tests
+# RaidAssist - Comprehensive Systems Tests
 # Copyright (C) 2025 Nicholas Acord <ncacord@protonmail.com>
 
 """
-test_enhanced_systems.py - Comprehensive tests for enhanced RaidAssist features.
+test_systems.py - Comprehensive tests for RaidAssist features.
 
-Tests the new enhanced systems including:
-- Enhanced logging manager
-- Robust error handling
-- Advanced overlay system
-- Enhanced UI components
+Tests the systems including:
+- Logging manager
+- Error handling
+- Overlay system
+- UI components
 - Integration between systems
 """
 
@@ -28,7 +28,7 @@ sys.path.insert(0, str(project_root))
 
 
 class TestLogging:
-    """Test the enhanced logging manager system."""
+    """Test the logging manager system."""
 
     @pytest.mark.enhanced
     def test_logging_manager_import(self):
@@ -91,7 +91,7 @@ class TestLogging:
 
 
 class TestErrorHandling:
-    """Test the enhanced error handling system."""
+    """Test the error handling system."""
 
     @pytest.mark.enhanced
     def test_error_handler_import(self):
@@ -140,7 +140,7 @@ class TestErrorHandling:
 
 
 class TestOverlay:
-    """Test the advanced overlay system."""
+    """Test the overlay system."""
 
     @pytest.mark.enhanced
     @pytest.mark.gui
@@ -192,7 +192,7 @@ class TestInterface:
     def test_interface_import(self):
         """Test that interface can be imported."""
         try:
-            from ui.interface import EnhancedRaidAssistUI  # type: ignore
+            from ui.interface import RaidAssistUI  # type: ignore
 
             assert True, "Interface imports successful"
         except ImportError as e:
