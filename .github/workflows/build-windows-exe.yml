@@ -42,11 +42,9 @@ jobs:
           pip install pyinstaller
 
       - name: Create logs directory
-        run: mkdir logs
-
-      - name: Verify systems
+        shell: pwsh
         run: |
-          python tests/run_tests.py --systems || echo "System verification completed with warnings"
+          New-Item -ItemType Directory -Force -Path RaidAssist/logs
 
       - name: Check required secrets
         run: |

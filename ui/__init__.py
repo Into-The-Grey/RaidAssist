@@ -42,7 +42,9 @@ if QT_AVAILABLE:
 
         OVERLAY_AVAILABLE = True
     except ImportError:
-        pass
+        # Handle failed overlay import gracefully
+
+        STANDARD_UI_AVAILABLE = True
 
 # Export available components
 __all__ = [

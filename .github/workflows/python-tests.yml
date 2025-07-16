@@ -61,7 +61,7 @@ jobs:
           python -m pytest tests/ --cov=api --cov=ui --cov=utils --cov-report=xml --cov-report=term-missing -m "not gui" || echo "Coverage completed"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
           flags: unittests
