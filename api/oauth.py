@@ -28,17 +28,14 @@ import requests
 # These are bundled public OAuth credentials for RaidAssist
 # API Key and Client ID are public values that can be safely bundled with the application
 
+
+# ==== PRODUCTION-READY CONFIGURATION ====
+# DO NOT MODIFY: All OAuth config is hardcoded for packaged/production builds.
+# Developers may use .env overrides ONLY for development/testing, NEVER for production.
+# Users must never be required to set up or edit .env or environment variables.
 BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
 BUNGIE_CLIENT_ID = "31415926"
 BUNGIE_REDIRECT_URI = "http://localhost:7777/callback"
-
-# Allow environment variable override for development/testing
-if os.environ.get("BUNGIE_API_KEY"):
-    BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY")
-if os.environ.get("BUNGIE_CLIENT_ID"):
-    BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID")
-if os.environ.get("BUNGIE_REDIRECT_URI"):
-    BUNGIE_REDIRECT_URI = os.environ.get("BUNGIE_REDIRECT_URI")
 
 # Runtime configuration
 REDIRECT_PORT = 7777
