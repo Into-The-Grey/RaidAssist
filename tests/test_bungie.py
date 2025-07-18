@@ -70,7 +70,13 @@ class TestBungieAPI:
         monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
         monkeypatch.setenv("TEST_TOKEN", "test_token")
 
-        result = safe_execute(bungie.load_token, default_return=None)
+        # Force reload of oauth module to pick up environment variables
+        import importlib
+        import api.oauth
+
+        importlib.reload(api.oauth)
+
+        result = bungie.load_token()
         assert result == "test_token", f"Expected 'test_token', got {result}"
 
         if TESTING:
@@ -110,7 +116,13 @@ class TestBungieAPI:
         monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
         monkeypatch.setenv("TEST_TOKEN", "default_test_token")
 
-        result = safe_execute(bungie.load_token, default_return=None)
+        # Force reload of oauth module to pick up environment variables
+        import importlib
+        import api.oauth
+
+        importlib.reload(api.oauth)
+
+        result = bungie.load_token()
         # Should get test token in test mode
         assert result == "default_test_token"
 
@@ -211,21 +223,43 @@ if __name__ == "__main__":
 
 
 def test_load_token_missing(monkeypatch):
+    """Test loading token when session file doesn't exist and OAuth disabled."""
     # Disable test mode for this test to test real OAuth failure
     monkeypatch.setenv("RAIDASSIST_TEST_MODE", "false")
+
+    # Force reload of oauth module
+    import importlib
+    import api.oauth
+
+    importlib.reload(api.oauth)
 
     # Patch SESSION_PATH to non-existent
     monkeypatch.setattr(bungie, "SESSION_PATH", "/non/existent/file.json")
     # Patch the new OAuth implementation to avoid real OAuth
     import api.oauth
 
-    monkeypatch.setattr(api.oauth, "get_access_token", lambda: None)
-    assert bungie.load_token() is None
+    monkeypatch.setattr(api.oauth, "authorize", lambda: None)
+    monkeypatch.setattr(api.oauth, "load_session", lambda: None)
+    monkeypatch.setattr(api.oauth, "refresh_token", lambda x: None)
+
+    # Should raise an exception which bungie.load_token handles and returns None
+    result = bungie.load_token()
+    assert result is None
 
 
 def test_fetch_profile_mock(monkeypatch, tmp_path):
+    """Test profile fetching with mocked OAuth and requests."""
+    # Set test mode
+    monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
+    monkeypatch.setenv("TEST_TOKEN", "fake_token")
+
+    # Force reload oauth
+    import importlib
+    import api.oauth
+
+    importlib.reload(api.oauth)
+
     # Patch out load_token and requests.get
-    monkeypatch.setattr(bungie, "load_token", lambda: "fake_token")
     monkeypatch.setattr(bungie, "BUNGIE_API_KEY", "test_key")
     monkeypatch.setattr(bungie, "CACHE_DIR", str(tmp_path))
     monkeypatch.setattr(bungie, "PROFILE_CACHE_PATH", str(tmp_path / "profile.json"))
@@ -265,5 +299,20 @@ def test_fetch_profile_mock(monkeypatch, tmp_path):
 
 
 def test_fetch_profile_no_token(monkeypatch):
-    monkeypatch.setattr(bungie, "load_token", lambda: None)
-    assert bungie.fetch_profile(3, "12345") is None
+    """Test profile fetching when no token is available."""
+    # Disable test mode to test real no-token scenario
+    monkeypatch.setenv("RAIDASSIST_TEST_MODE", "false")
+
+    # Force reload oauth
+    import importlib
+    import api.oauth
+
+    importlib.reload(api.oauth)
+
+    # Mock load_token to return None and avoid OAuth flow
+    monkeypatch.setattr(api.oauth, "load_session", lambda: None)
+    monkeypatch.setattr(api.oauth, "authorize", lambda: None)
+
+    # Should return None when no token available
+    result = bungie.fetch_profile(3, "12345")
+    assert result is None

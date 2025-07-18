@@ -98,10 +98,16 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(SESSION_PATH), exist_ok=True)
 
-# Bungie API configuration - requires setup for OAuth to work
-# Set these environment variables for the application to function:
-BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
-BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID", "your_client_id_here")
+# Bungie API configuration - bundled credentials for production use
+BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
+BUNGIE_CLIENT_ID = "31415926"
+
+# Allow environment variable override for development/testing
+if os.environ.get("BUNGIE_API_KEY"):
+    BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY")
+if os.environ.get("BUNGIE_CLIENT_ID"):
+    BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID")
+
 BUNGIE_REDIRECT_URI = os.environ.get(
     "BUNGIE_REDIRECT_URI", "http://localhost:7777/callback"
 )

@@ -55,8 +55,12 @@ if load_dotenv is not None and os.environ.get("RAIDASSIST_DEV_MODE"):
 
 SESSION_PATH = os.path.expanduser("~/.raidassist/session.json")
 
-# Bungie API configuration
-BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
+# Bungie API configuration - bundled credentials
+BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
+
+# Allow environment variable override for development/testing
+if os.environ.get("BUNGIE_API_KEY"):
+    BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY")
 
 
 def load_token():

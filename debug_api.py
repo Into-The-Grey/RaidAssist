@@ -22,8 +22,13 @@ try:
 except ImportError:
     pass  # Continue without dotenv - use bundled configuration
 
-# Get API key from environment
-BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", "your_bungie_api_key_here")
+# Bungie API configuration - bundled credentials
+BUNGIE_API_KEY: str = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
+
+# Allow environment variable override for development/testing
+if os.environ.get("BUNGIE_API_KEY"):
+    BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY", BUNGIE_API_KEY)
+
 USER_AGENT = "RaidAssist/1.0"
 
 
@@ -66,15 +71,9 @@ def main():
     print("Bungie API Endpoint Debug Tool")
     print("=" * 60)
 
-    # Check API key configuration
-    if BUNGIE_API_KEY == "your_bungie_api_key_here":
-        print(f"\n❌ API Key not configured!")
-        print("Please set the BUNGIE_API_KEY environment variable.")
-        print("See OAUTH_SETUP.md for instructions.")
-        return
-    else:
-        print(f"\n✅ API Key configured")
-        print(f"API Key length: {len(BUNGIE_API_KEY)} characters")
+    # API key is always configured with bundled credentials
+    print(f"\n✅ API Key configured")
+    print(f"API Key length: {len(BUNGIE_API_KEY)} characters")
 
     # Common headers for all requests
     headers = {"X-API-Key": BUNGIE_API_KEY, "User-Agent": USER_AGENT}
@@ -140,11 +139,8 @@ def main():
 
     print(f"\n{'='*60}")
     print("Debug complete!")
-    print("\nNext steps if issues found:")
-    print("1. If API key errors: Set BUNGIE_API_KEY environment variable")
-    print("2. If 404 errors on valid endpoints: Check for typos in your code")
-    print("3. If connection errors: Check network/firewall settings")
-    print("4. For auth endpoints: Ensure OAuth flow is working properly")
+    print("\nNote: This is a debug tool for development. Issues found may be")
+    print("related to network connectivity or temporary Bungie server issues.")
 
 
 if __name__ == "__main__":

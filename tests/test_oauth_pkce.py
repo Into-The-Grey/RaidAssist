@@ -141,6 +141,10 @@ def test_bungie_integration():
     importlib.reload(api.oauth)
     importlib.reload(api.bungie)
 
+    from api.oauth import (
+        BUNGIE_API_KEY as OAUTH_API_KEY,
+        BUNGIE_CLIENT_ID as OAUTH_CLIENT_ID,
+    )
     from api.bungie import (
         BUNGIE_API_KEY,
         BUNGIE_CLIENT_ID,
@@ -150,8 +154,14 @@ def test_bungie_integration():
 
     # Test environment configuration (should use same test values set earlier)
     assert (
+        OAUTH_API_KEY == "test_api_key_12345"
+    ), f"OAuth API key not from environment - got '{OAUTH_API_KEY}'"
+    assert (
         BUNGIE_API_KEY == "test_api_key_12345"
     ), f"Bungie API key not from environment - got '{BUNGIE_API_KEY}'"
+    assert (
+        OAUTH_CLIENT_ID == "12345"
+    ), f"OAuth Client ID not from environment - got '{OAUTH_CLIENT_ID}'"
     assert (
         BUNGIE_CLIENT_ID == "12345"
     ), f"Bungie Client ID not from environment - got '{BUNGIE_CLIENT_ID}'"
@@ -163,19 +173,13 @@ def test_bungie_integration():
     print("✅ Bungie API integration configured correctly")
 
 
-def test_placeholder_handling():
-    """Test that the system properly handles missing environment variables."""
-    print("Testing placeholder handling for missing environment variables...")
+def test_bundled_credentials():
+    """Test that the system properly handles bundled credentials."""
+    print("Testing bundled credential configuration...")
 
-    # Temporarily clear OAuth-related env vars
+    # Back up environment variables
     env_backup = {}
-    oauth_vars = [
-        "BUNGIE_API_KEY",
-        "BUNGIE_CLIENT_ID",
-        "BUNGIE_REDIRECT_URI",
-    ]
-
-    for var in oauth_vars:
+    for var in ["BUNGIE_API_KEY", "BUNGIE_CLIENT_ID", "BUNGIE_REDIRECT_URI"]:
         if var in os.environ:
             env_backup[var] = os.environ[var]
             del os.environ[var]
@@ -189,11 +193,14 @@ def test_placeholder_handling():
         importlib.reload(api.oauth)
         importlib.reload(api.bungie)
 
-        # Should use placeholder values when env vars not set
-        assert api.oauth.BUNGIE_API_KEY == "your_bungie_api_key_here"
-        assert api.oauth.BUNGIE_CLIENT_ID == "your_client_id_here"
+        # Should use bundled values when env vars not set
+        assert (
+            api.oauth.BUNGIE_API_KEY
+            == "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
+        )
+        assert api.oauth.BUNGIE_CLIENT_ID == "31415926"
 
-        print("✅ Placeholder handling works correctly")
+        print("✅ Bundled credential handling works correctly")
 
     finally:
         # Restore environment variables
@@ -211,7 +218,7 @@ def run_all_tests():
         test_pkce_utilities()
         test_session_management()
         test_bungie_integration()
-        test_placeholder_handling()
+        test_bundled_credentials()
 
         print("\n" + "=" * 50)
         print("🎉 All OAuth PKCE tests passed!")
@@ -229,3 +236,43 @@ def run_all_tests():
 if __name__ == "__main__":
     success = run_all_tests()
     sys.exit(0 if success else 1)
+
+
+# Additional pytest-compatible test functions for CI
+def test_oauth_environment_setup():
+    """Pytest version of test_bungie_integration for CI."""
+    import os
+
+    # Set test environment variables
+    os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
+    os.environ["BUNGIE_CLIENT_ID"] = "12345"
+    os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+    os.environ["RAIDASSIST_TEST_MODE"] = "true"
+
+    # Force reload of modules to pick up environment variables
+    import importlib
+    import api.oauth
+    import api.bungie
+
+    importlib.reload(api.oauth)
+    importlib.reload(api.bungie)
+
+    from api.oauth import (
+        BUNGIE_API_KEY as OAUTH_API_KEY,
+        BUNGIE_CLIENT_ID as OAUTH_CLIENT_ID,
+    )
+    from api.bungie import BUNGIE_API_KEY, BUNGIE_CLIENT_ID
+
+    # Test environment configuration
+    assert (
+        OAUTH_API_KEY == "test_api_key_12345"
+    ), f"OAuth API key not from environment - got '{OAUTH_API_KEY}'"
+    assert (
+        BUNGIE_API_KEY == "test_api_key_12345"
+    ), f"Bungie API key not from environment - got '{BUNGIE_API_KEY}'"
+    assert (
+        OAUTH_CLIENT_ID == "12345"
+    ), f"OAuth Client ID not from environment - got '{OAUTH_CLIENT_ID}'"
+    assert (
+        BUNGIE_CLIENT_ID == "12345"
+    ), f"Bungie Client ID not from environment - got '{BUNGIE_CLIENT_ID}'"

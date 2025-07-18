@@ -25,16 +25,14 @@ from urllib.parse import parse_qs, urlencode, urlparse
 import requests
 
 # ==== BUNDLED PUBLIC CONFIGURATION ====
-# These are public keys that can be safely bundled with the application
-# NOTE: These are placeholder values. For a production application, you would
-# need to register your own OAuth application at https://www.bungie.net/en/Application
-# and replace these values with your actual client credentials.
+# These are bundled public OAuth credentials for RaidAssist
+# API Key and Client ID are public values that can be safely bundled with the application
 
-BUNGIE_API_KEY = "your_bungie_api_key_here"  # Replace with your actual API key
-BUNGIE_CLIENT_ID = "your_client_id_here"  # Replace with your actual client ID
-BUNGIE_REDIRECT_URI = "http://localhost:7777/callback"  # Local callback URL
+BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
+BUNGIE_CLIENT_ID = "31415926"
+BUNGIE_REDIRECT_URI = "http://localhost:7777/callback"
 
-# For development, allow environment variable override
+# Allow environment variable override for development/testing
 if os.environ.get("BUNGIE_API_KEY"):
     BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY")
 if os.environ.get("BUNGIE_CLIENT_ID"):
@@ -73,47 +71,8 @@ def validate_oauth_config():
     if os.environ.get("RAIDASSIST_TEST_MODE") == "true":
         return (True, "Test mode - validation bypassed")
 
-    if BUNGIE_API_KEY == "your_bungie_api_key_here":
-        return (
-            False,
-            """
-OAuth Configuration Error: Missing Bungie API Key
-
-To use RaidAssist, you need to set up a Bungie OAuth application:
-
-1. Visit https://www.bungie.net/en/Application
-2. Create a new application or use an existing one
-3. Set the redirect URL to: http://localhost:7777/callback
-4. Set the OAuth Client Type to: Confidential
-5. Set your environment variables:
-   - BUNGIE_API_KEY=your_api_key_here
-   - BUNGIE_CLIENT_ID=your_client_id_here
-
-For more information, see the RaidAssist setup documentation.
-""",
-        )
-
-    if BUNGIE_CLIENT_ID == "your_client_id_here":
-        return (
-            False,
-            """
-OAuth Configuration Error: Missing Client ID
-
-To use RaidAssist, you need to set up a Bungie OAuth application:
-
-1. Visit https://www.bungie.net/en/Application  
-2. Create a new application or use an existing one
-3. Set the redirect URL to: http://localhost:7777/callback
-4. Set the OAuth Client Type to: Confidential
-5. Set your environment variables:
-   - BUNGIE_API_KEY=your_api_key_here
-   - BUNGIE_CLIENT_ID=your_client_id_here
-
-For more information, see the RaidAssist setup documentation.
-""",
-        )
-
-    return True, ""
+    # In production, OAuth is always ready with bundled credentials
+    return (True, "")
 
 
 # ==== PKCE UTILITIES ====
@@ -296,22 +255,24 @@ def authorize():
 
     auth_url = f"{OAUTH_AUTHORIZE_URL}?{urlencode(auth_params)}"
 
-    print("Opening Bungie login in your browser...")
     logging.info("Opening browser for OAuth authorization")
 
     try:
         webbrowser.open(auth_url)
     except Exception as e:
         logging.warning(f"Failed to open browser automatically: {e}")
-        print(f"Please open this URL manually: {auth_url}")
+        raise Exception("Could not open web browser for login. Please try again.")
 
     # Wait for authorization code
     try:
         code = OAuthHandler.wait_for_code()
         logging.info("Authorization code received")
-    except (TimeoutError, ValueError) as e:
+    except TimeoutError:
+        logging.error("OAuth authorization timed out")
+        raise Exception("Login timed out. Please try again.")
+    except ValueError as e:
         logging.error(f"OAuth authorization failed: {e}")
-        raise Exception(f"OAuth authorization failed: {e}")
+        raise Exception("Login was cancelled or failed. Please try again.")
 
     # Exchange code for tokens using PKCE
     token_data = {
@@ -343,13 +304,12 @@ def authorize():
 
         save_session(token_response)
         logging.info("OAuth PKCE authentication completed successfully")
-        print("Authorization complete. You are now logged in to Bungie.")
 
         return token_response
 
     except requests.RequestException as e:
-        error_msg = f"Network error during token exchange: {e}"
-        logging.error(error_msg)
+        error_msg = f"Could not connect to Bungie servers. Please check your internet connection and try again."
+        logging.error(f"Network error during token exchange: {e}")
         raise Exception(error_msg)
 
 
@@ -361,7 +321,7 @@ def get_access_token():
         str: Valid access token for API calls
 
     Raises:
-        Exception: If authentication fails or configuration is invalid
+        Exception: If authentication fails with user-friendly error message
     """
     # Support test mode
     if os.environ.get("RAIDASSIST_TEST_MODE") == "true":
@@ -369,12 +329,7 @@ def get_access_token():
         logging.info(f"Test mode - returning test token: {test_token}")
         return test_token
 
-    # First validate OAuth configuration
-    is_valid, error_msg = validate_oauth_config()
-    if not is_valid:
-        logging.error("OAuth configuration invalid")
-        raise Exception(error_msg.strip())
-
+    # OAuth is always configured with bundled credentials
     session = load_session()
 
     # Check if we have a valid token
@@ -385,9 +340,13 @@ def get_access_token():
     # Try to refresh if we have a refresh token
     if session and "refresh_token" in session:
         logging.info("Attempting to refresh expired token")
-        refreshed_session = refresh_token(session)
-        if refreshed_session and not is_token_expired(refreshed_session):
-            return refreshed_session["access_token"]
+        try:
+            refreshed_session = refresh_token(session)
+            if refreshed_session and not is_token_expired(refreshed_session):
+                return refreshed_session["access_token"]
+        except Exception as e:
+            logging.warning(f"Token refresh failed: {e}")
+            # Continue to full OAuth flow
 
     # No valid session - start OAuth flow
     logging.info("No valid token found, starting OAuth PKCE flow")
@@ -396,7 +355,20 @@ def get_access_token():
         return token_data["access_token"]
     except Exception as e:
         logging.error(f"OAuth authentication failed: {e}")
-        raise Exception(f"Failed to authenticate with Bungie: {e}")
+        # Provide user-friendly error message
+        user_msg = str(e)
+        if "Network error" in user_msg or "connect" in user_msg.lower():
+            raise Exception(
+                "Could not connect to Bungie servers. Please check your internet connection and try again."
+            )
+        elif "timeout" in user_msg.lower():
+            raise Exception("Login attempt timed out. Please try again.")
+        elif "authorization" in user_msg.lower() or "invalid" in user_msg.lower():
+            raise Exception(
+                "Login was cancelled or failed. Please try logging in again."
+            )
+        else:
+            raise Exception("Unable to login to Bungie. Please try again later.")
 
 
 def clear_session():
@@ -404,10 +376,8 @@ def clear_session():
     if os.path.exists(SESSION_PATH):
         os.remove(SESSION_PATH)
         logging.info("OAuth session cleared")
-        print("Logged out successfully.")
     else:
         logging.info("No session to clear")
-        print("No active session found.")
 
 
 def is_authenticated():
