@@ -66,11 +66,11 @@ class TestBungieAPI:
         if not PYTEST_AVAILABLE:
             return self._manual_test_load_token()
 
-        # Set test mode environment variables
+        # Set test mode environment variables before import
         monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
         monkeypatch.setenv("TEST_TOKEN", "test_token")
 
-        # Force reload of oauth module to pick up environment variables
+        # Import and reload api.oauth after env vars set
         import importlib
         import api.oauth
 
@@ -78,7 +78,6 @@ class TestBungieAPI:
 
         result = bungie.load_token()
         assert result == "test_token", f"Expected 'test_token', got {result}"
-
         if TESTING:
             test_logger.info("Token loading test passed")
 
@@ -112,11 +111,11 @@ class TestBungieAPI:
         if not PYTEST_AVAILABLE:
             return self._manual_test_missing_token()
 
-        # Set test mode with a specific test token
+        # Set test mode with a specific test token before import
         monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
         monkeypatch.setenv("TEST_TOKEN", "default_test_token")
 
-        # Force reload of oauth module to pick up environment variables
+        # Import and reload api.oauth after env vars set
         import importlib
         import api.oauth
 
@@ -131,10 +130,12 @@ class TestBungieAPI:
         if not PYTEST_AVAILABLE:
             return
 
-        # Disable test mode and mock OAuth to fail
+        # Disable test mode and mock OAuth to fail before import
         monkeypatch.setenv("RAIDASSIST_TEST_MODE", "false")
+        import importlib
         import api.oauth
 
+        importlib.reload(api.oauth)
         monkeypatch.setattr(api.oauth, "get_access_token", lambda: None)
 
         result = safe_execute(bungie.load_token, default_return=None)
@@ -227,7 +228,7 @@ def test_load_token_missing(monkeypatch):
     # Disable test mode for this test to test real OAuth failure
     monkeypatch.setenv("RAIDASSIST_TEST_MODE", "false")
 
-    # Force reload of oauth module
+    # Import and reload api.oauth after env vars set
     import importlib
     import api.oauth
 
@@ -236,8 +237,6 @@ def test_load_token_missing(monkeypatch):
     # Patch SESSION_PATH to non-existent
     monkeypatch.setattr(bungie, "SESSION_PATH", "/non/existent/file.json")
     # Patch the new OAuth implementation to avoid real OAuth
-    import api.oauth
-
     monkeypatch.setattr(api.oauth, "authorize", lambda: None)
     monkeypatch.setattr(api.oauth, "load_session", lambda: None)
     monkeypatch.setattr(api.oauth, "refresh_token", lambda x: None)
@@ -249,11 +248,11 @@ def test_load_token_missing(monkeypatch):
 
 def test_fetch_profile_mock(monkeypatch, tmp_path):
     """Test profile fetching with mocked OAuth and requests."""
-    # Set test mode
+    # Set test mode before import
     monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
     monkeypatch.setenv("TEST_TOKEN", "fake_token")
 
-    # Force reload oauth
+    # Import and reload oauth after env vars set
     import importlib
     import api.oauth
 
@@ -303,7 +302,7 @@ def test_fetch_profile_no_token(monkeypatch):
     # Disable test mode to test real no-token scenario
     monkeypatch.setenv("RAIDASSIST_TEST_MODE", "false")
 
-    # Force reload oauth
+    # Import and reload oauth after env vars set
     import importlib
     import api.oauth
 

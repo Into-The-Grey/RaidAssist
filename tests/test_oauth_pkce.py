@@ -15,19 +15,25 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-def test_bundled_configuration():
+def test_bundled_configuration(monkeypatch=None):
     """Test that OAuth configuration can be properly set up."""
     print("Testing OAuth configuration setup...")
 
-    # Set test environment variables
-    import os
+    # Set test environment variables before import
+    if monkeypatch:
+        monkeypatch.setenv("BUNGIE_API_KEY", "test_api_key_12345")
+        monkeypatch.setenv("BUNGIE_CLIENT_ID", "12345")
+        monkeypatch.setenv("BUNGIE_REDIRECT_URI", "http://localhost:7777/callback")
+        monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
+    else:
+        import os
 
-    os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
-    os.environ["BUNGIE_CLIENT_ID"] = "12345"
-    os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
-    os.environ["RAIDASSIST_TEST_MODE"] = "true"  # Enable test mode
+        os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
+        os.environ["BUNGIE_CLIENT_ID"] = "12345"
+        os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+        os.environ["RAIDASSIST_TEST_MODE"] = "true"
 
-    # Re-import to pick up new environment variables
+    # Import and reload api.oauth after env vars set
     import importlib
     import api.oauth
 
@@ -45,7 +51,7 @@ def test_bundled_configuration():
         BUNGIE_REDIRECT_URI == "http://localhost:7777/callback"
     ), f"Redirect URI mismatch - got '{BUNGIE_REDIRECT_URI}'"
 
-    print("✅ OAuth configuration setup working correctly")
+    print("\u2705 OAuth configuration setup working correctly")
 
 
 def test_pkce_utilities():
@@ -121,19 +127,25 @@ def test_session_management():
             os.unlink(temp_session_path)
 
 
-def test_bungie_integration():
+def test_bungie_integration(monkeypatch=None):
     """Test Bungie API integration functions."""
     print("Testing Bungie API integration...")
 
-    # Set test environment variables before importing
-    import os
+    # Set test environment variables before import
+    if monkeypatch:
+        monkeypatch.setenv("BUNGIE_API_KEY", "test_api_key_12345")
+        monkeypatch.setenv("BUNGIE_CLIENT_ID", "12345")
+        monkeypatch.setenv("BUNGIE_REDIRECT_URI", "http://localhost:7777/callback")
+        monkeypatch.setenv("RAIDASSIST_TEST_MODE", "true")
+    else:
+        import os
 
-    os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
-    os.environ["BUNGIE_CLIENT_ID"] = "12345"
-    os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
-    os.environ["RAIDASSIST_TEST_MODE"] = "true"  # Enable test mode
+        os.environ["BUNGIE_API_KEY"] = "test_api_key_12345"
+        os.environ["BUNGIE_CLIENT_ID"] = "12345"
+        os.environ["BUNGIE_REDIRECT_URI"] = "http://localhost:7777/callback"
+        os.environ["RAIDASSIST_TEST_MODE"] = "true"
 
-    # Force reload of modules to pick up environment variables
+    # Import and reload modules after env vars set
     import importlib
     import api.oauth
     import api.bungie
@@ -170,7 +182,7 @@ def test_bungie_integration():
     assert callable(ensure_authenticated), "ensure_authenticated not callable"
     assert callable(logout_user), "logout_user not callable"
 
-    print("✅ Bungie API integration configured correctly")
+    print("\u2705 Bungie API integration configured correctly")
 
 
 def test_bundled_credentials():
