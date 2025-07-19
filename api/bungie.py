@@ -98,19 +98,21 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(SESSION_PATH), exist_ok=True)
 
-# Bungie API configuration - bundled credentials for production use
-BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
-BUNGIE_CLIENT_ID = "31415926"
 
-# Allow environment variable override for development/testing
-if os.environ.get("BUNGIE_API_KEY"):
-    BUNGIE_API_KEY = os.environ.get("BUNGIE_API_KEY")
-if os.environ.get("BUNGIE_CLIENT_ID"):
-    BUNGIE_CLIENT_ID = os.environ.get("BUNGIE_CLIENT_ID")
+def get_bungie_api_key():
+    return os.environ.get(
+        "BUNGIE_API_KEY",
+        "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5",
+    )
 
-BUNGIE_REDIRECT_URI = os.environ.get(
-    "BUNGIE_REDIRECT_URI", "http://localhost:7777/callback"
-)
+
+def get_bungie_client_id():
+    return os.environ.get("BUNGIE_CLIENT_ID", "31415926")
+
+
+def get_bungie_redirect_uri():
+    return os.environ.get("BUNGIE_REDIRECT_URI", "http://localhost:7777/callback")
+
 
 PROFILE_CACHE_PATH = os.path.join(CACHE_DIR, "profile.json")
 
@@ -223,7 +225,7 @@ def fetch_profile(
                 url = f"https://www.bungie.net/Platform/Destiny2/{membership_type}/Profile/{membership_id}/"
                 params = {"components": components}
                 headers = {
-                    "X-API-Key": BUNGIE_API_KEY,
+                    "X-API-Key": get_bungie_api_key(),
                     "Authorization": f"Bearer {token}",
                     "User-Agent": USER_AGENT,
                 }
@@ -472,7 +474,7 @@ def get_membership_info(bungie_tag: str) -> Optional[Dict[str, Any]]:
             # According to Bungie API docs: /Destiny2/SearchDestinyPlayer/{membershipType}/{displayName}/
             url = f"https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayer/-1/{username}/"
             headers = {
-                "X-API-Key": BUNGIE_API_KEY,
+                "X-API-Key": get_bungie_api_key(),
                 "Authorization": f"Bearer {token}",
                 "User-Agent": USER_AGENT,
             }
@@ -512,7 +514,7 @@ def test_api_connection() -> bool:
     """
     try:
         url = "https://www.bungie.net/Platform/Destiny2/Manifest/"
-        headers = {"X-API-Key": BUNGIE_API_KEY, "User-Agent": USER_AGENT}
+        headers = {"X-API-Key": get_bungie_api_key(), "User-Agent": USER_AGENT}
 
         _rate_limit()
         response = requests.get(url, headers=headers, timeout=10)

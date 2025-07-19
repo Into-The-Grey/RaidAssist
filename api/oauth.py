@@ -33,9 +33,22 @@ import requests
 # DO NOT MODIFY: All OAuth config is hardcoded for packaged/production builds.
 # Developers may use .env overrides ONLY for development/testing, NEVER for production.
 # Users must never be required to set up or edit .env or environment variables.
-BUNGIE_API_KEY = "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
-BUNGIE_CLIENT_ID = "31415926"
-BUNGIE_REDIRECT_URI = "http://localhost:7777/callback"
+
+
+def get_bungie_api_key():
+    return os.environ.get(
+        "BUNGIE_API_KEY",
+        "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5",
+    )
+
+
+def get_bungie_client_id():
+    return os.environ.get("BUNGIE_CLIENT_ID", "31415926")
+
+
+def get_bungie_redirect_uri():
+    return os.environ.get("BUNGIE_REDIRECT_URI", "http://localhost:7777/callback")
+
 
 # Runtime configuration
 REDIRECT_PORT = 7777
@@ -124,12 +137,12 @@ def refresh_token(session):
     data = {
         "grant_type": "refresh_token",
         "refresh_token": session["refresh_token"],
-        "client_id": BUNGIE_CLIENT_ID,
+        "client_id": get_bungie_client_id(),
     }
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "X-API-Key": BUNGIE_API_KEY,
+        "X-API-Key": get_bungie_api_key(),
     }
 
     try:
@@ -243,9 +256,9 @@ def authorize():
 
     # Build authorization URL with PKCE parameters
     auth_params = {
-        "client_id": BUNGIE_CLIENT_ID,
+        "client_id": get_bungie_client_id(),
         "response_type": "code",
-        "redirect_uri": BUNGIE_REDIRECT_URI,
+        "redirect_uri": get_bungie_redirect_uri(),
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
     }
@@ -275,14 +288,14 @@ def authorize():
     token_data = {
         "grant_type": "authorization_code",
         "code": code,
-        "client_id": BUNGIE_CLIENT_ID,
+        "client_id": get_bungie_client_id(),
         "code_verifier": code_verifier,
-        "redirect_uri": BUNGIE_REDIRECT_URI,
+        "redirect_uri": get_bungie_redirect_uri(),
     }
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "X-API-Key": BUNGIE_API_KEY,
+        "X-API-Key": get_bungie_api_key(),
     }
 
     try:

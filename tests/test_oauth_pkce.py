@@ -39,17 +39,9 @@ def test_bundled_configuration(monkeypatch=None):
 
     importlib.reload(api.oauth)
 
-    from api.oauth import BUNGIE_API_KEY, BUNGIE_CLIENT_ID, BUNGIE_REDIRECT_URI
-
-    assert (
-        BUNGIE_API_KEY == "test_api_key_12345"
-    ), f"API key not loaded from environment - got '{BUNGIE_API_KEY}'"
-    assert (
-        BUNGIE_CLIENT_ID == "12345"
-    ), f"Client ID not loaded from environment - got '{BUNGIE_CLIENT_ID}'"
-    assert (
-        BUNGIE_REDIRECT_URI == "http://localhost:7777/callback"
-    ), f"Redirect URI mismatch - got '{BUNGIE_REDIRECT_URI}'"
+    assert api.oauth.get_bungie_api_key() == "test_api_key_12345"
+    assert api.oauth.get_bungie_client_id() == "12345"
+    assert api.oauth.get_bungie_redirect_uri() == "http://localhost:7777/callback"
 
     print("\u2705 OAuth configuration setup working correctly")
 
@@ -153,30 +145,15 @@ def test_bungie_integration(monkeypatch=None):
     importlib.reload(api.oauth)
     importlib.reload(api.bungie)
 
-    from api.oauth import (
-        BUNGIE_API_KEY as OAUTH_API_KEY,
-        BUNGIE_CLIENT_ID as OAUTH_CLIENT_ID,
-    )
-    from api.bungie import (
-        BUNGIE_API_KEY,
-        BUNGIE_CLIENT_ID,
-        ensure_authenticated,
-        logout_user,
-    )
+    assert api.oauth.get_bungie_api_key() == "test_api_key_12345"
+    assert api.bungie.get_bungie_api_key() == "test_api_key_12345"
+    assert api.oauth.get_bungie_client_id() == "12345"
+    assert api.bungie.get_bungie_client_id() == "12345"
+    # Test function availability (shouldn't raise errors)
+    from api.bungie import ensure_authenticated, logout_user
 
-    # Test environment configuration (should use same test values set earlier)
-    assert (
-        OAUTH_API_KEY == "test_api_key_12345"
-    ), f"OAuth API key not from environment - got '{OAUTH_API_KEY}'"
-    assert (
-        BUNGIE_API_KEY == "test_api_key_12345"
-    ), f"Bungie API key not from environment - got '{BUNGIE_API_KEY}'"
-    assert (
-        OAUTH_CLIENT_ID == "12345"
-    ), f"OAuth Client ID not from environment - got '{OAUTH_CLIENT_ID}'"
-    assert (
-        BUNGIE_CLIENT_ID == "12345"
-    ), f"Bungie Client ID not from environment - got '{BUNGIE_CLIENT_ID}'"
+    assert callable(ensure_authenticated), "ensure_authenticated not callable"
+    assert callable(logout_user), "logout_user not callable"
 
     # Test function availability (shouldn't raise errors)
     assert callable(ensure_authenticated), "ensure_authenticated not callable"
@@ -207,10 +184,10 @@ def test_bundled_credentials():
 
         # Should use bundled values when env vars not set
         assert (
-            api.oauth.BUNGIE_API_KEY
+            api.oauth.get_bungie_api_key()
             == "b4c3ff9cf4fb4ba3a1a0b8a5a8e3f8e9c2d6b5a8c9f2e1d4a7b0c6f5e8d9c2a5"
         )
-        assert api.oauth.BUNGIE_CLIENT_ID == "31415926"
+        assert api.oauth.get_bungie_client_id() == "31415926"
 
         print("✅ Bundled credential handling works correctly")
 
@@ -269,22 +246,7 @@ def test_oauth_environment_setup():
     importlib.reload(api.oauth)
     importlib.reload(api.bungie)
 
-    from api.oauth import (
-        BUNGIE_API_KEY as OAUTH_API_KEY,
-        BUNGIE_CLIENT_ID as OAUTH_CLIENT_ID,
-    )
-    from api.bungie import BUNGIE_API_KEY, BUNGIE_CLIENT_ID
-
-    # Test environment configuration
-    assert (
-        OAUTH_API_KEY == "test_api_key_12345"
-    ), f"OAuth API key not from environment - got '{OAUTH_API_KEY}'"
-    assert (
-        BUNGIE_API_KEY == "test_api_key_12345"
-    ), f"Bungie API key not from environment - got '{BUNGIE_API_KEY}'"
-    assert (
-        OAUTH_CLIENT_ID == "12345"
-    ), f"OAuth Client ID not from environment - got '{OAUTH_CLIENT_ID}'"
-    assert (
-        BUNGIE_CLIENT_ID == "12345"
-    ), f"Bungie Client ID not from environment - got '{BUNGIE_CLIENT_ID}'"
+    assert api.oauth.get_bungie_api_key() == "test_api_key_12345"
+    assert api.bungie.get_bungie_api_key() == "test_api_key_12345"
+    assert api.oauth.get_bungie_client_id() == "12345"
+    assert api.bungie.get_bungie_client_id() == "12345"
