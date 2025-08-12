@@ -18,7 +18,7 @@ jobs:
     steps:
       # Checks out the code – technically optional for labeler, but enables future extensibility (lint, coverage, etc.)
       - name: Checkout code (optional)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Apply labels as defined in .github/labeler.yml
       - name: Run Labeler

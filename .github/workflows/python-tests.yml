@@ -21,7 +21,7 @@ jobs:
       RAIDASSIST_TEST_MODE: true  # Enable test mode to bypass OAuth flows
       QT_QPA_PLATFORM: offscreen  # Enable headless Qt for CI
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
