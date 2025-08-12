@@ -18,7 +18,7 @@ jobs:
 
     steps:
       # Welcomes first-time contributors on their first PR or issue
-      - uses: actions/first-interaction@v2
+      - uses: actions/first-interaction@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           issue-message: |
